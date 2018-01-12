@@ -12,12 +12,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import javax.tools.Diagnostic;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Function;
 
@@ -25,11 +24,6 @@ import static com.vodafone.binding.processor.BinderCodeGenerator.VARIABLE_NAME_D
 
 class BinderFunctionStatements implements Function<BoundTypes, List<String>> {
 
-    private final ProcessingEnvironment environment;
-
-    BinderFunctionStatements(ProcessingEnvironment environment) {
-        this.environment = environment;
-    }
 
     @Override
     public List<String> apply(BoundTypes boundTypes) {
@@ -76,6 +70,7 @@ class BinderFunctionStatements implements Function<BoundTypes, List<String>> {
 
     private Map<String, ? extends Element> sourcesMap(BoundTypes boundTypes) {
         return Chain.let(sourceObservables(boundTypes))
+                .apply(observable -> showErrorOnEmptySubscriptionSource(boundTypes, observable))
                 .apply(observable -> showErrorOnDuplicateAnnotationValues(boundTypes, observable))
                 .call()
                 .toMap(this::bySubscriptionNameValue)
@@ -90,6 +85,16 @@ class BinderFunctionStatements implements Function<BoundTypes, List<String>> {
                 .filter(element -> element.getAnnotation(SubscriptionName.class) != null);
     }
 
+    private void showErrorOnEmptySubscriptionSource(BoundTypes boundTypes,
+                                                    Observable<? extends Element> observable) {
+        Chain.let(observable)
+                .map(Observable::isEmpty)
+                .map(Single::blockingGet)
+                .when(Boolean::booleanValue)
+                .invoke(Curry.toAction(this::showEmptySourcesFactoryError, boundTypes));
+
+    }
+
     private void showErrorOnDuplicateAnnotationValues(BoundTypes boundTypes,
                                                       Observable<? extends Element> sourcesObservable) {
         Chain.let(sourcesObservable)
@@ -97,25 +102,27 @@ class BinderFunctionStatements implements Function<BoundTypes, List<String>> {
                 .pair(observable -> observable.toList().blockingGet())
                 .whenNot(pair -> pair.getValue1().size() == uniqueAnnotationValues(pair.getValue0()))
                 .thenMap(Pair::getValue1)
-                .apply(Curry.toConsumer(this::showCompilationError, boundTypes));
+                .apply(Curry.toConsumer(this::showDuplicateSourcesError, boundTypes));
     }
 
     private int uniqueAnnotationValues(Observable<String> annotationValues) {
         return annotationValues.distinct().toList().blockingGet().size();
     }
 
-    private void showCompilationError(BoundTypes boundTypes, List<String> annotatedMembers) {
-        printError("values of @" + SubscriptionName.class.getSimpleName() + " should be unique");
-        printError("found in "
+    private void showDuplicateSourcesError(BoundTypes boundTypes, List<String> annotatedMembers) {
+        Log.error("values of @" + SubscriptionName.class.getSimpleName() + " should be unique");
+        Log.error("found in "
                 + boundTypes.getElementWithSubscriptionNameAnnotations()
                 + " the following  values for @"
                 + SubscriptionName.class.getSimpleName()
                 + " : " + annotatedMembers);
     }
 
-    private void printError(Object object) {
-        environment.getMessager().printMessage(Diagnostic.Kind.ERROR, String.valueOf(object));
+    private void showEmptySourcesFactoryError(BoundTypes boundTypes) {
+        Log.error("No @" + SubscriptionName.class.getSimpleName() + " found in "
+                + boundTypes.getElementWithSubscriptionNameAnnotations());
     }
+
 
     private List<BoundElements> toBoundElements(Map<String, ? extends Element> sources,
                                                 Map.Entry<String, ? extends Collection<? extends Element>> entry) {

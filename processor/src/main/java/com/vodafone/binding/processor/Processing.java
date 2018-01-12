@@ -34,7 +34,6 @@ class Processing implements BiPredicate<Set<? extends TypeElement>, RoundEnviron
 
     @Override
     public boolean test(Set<? extends TypeElement> typeElements, RoundEnvironment round) {
-
         Chain.optional(round.getElementsAnnotatedWith(SubscriptionsFactory.class))
                 .defaultIfEmpty(new LinkedHashSet<>())
                 .flatMap(Observable::fromIterable)
@@ -53,5 +52,7 @@ class Processing implements BiPredicate<Set<? extends TypeElement>, RoundEnviron
         writer.close();
 
     }
+
+
 
 }

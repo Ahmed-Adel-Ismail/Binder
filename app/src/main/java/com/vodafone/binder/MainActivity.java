@@ -9,33 +9,28 @@ import com.vodafone.binding.annotations.SubscribeTo;
 import com.vodafone.binding.annotations.SubscriptionsFactory;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.Subject;
 
-@SubscriptionsFactory(MainViewModel.class)
+@SubscriptionsFactory(ViewModel.class)
 public class MainActivity extends AppCompatActivity {
 
-    private CompositeDisposable compositeDisposable;
-    private MainViewModel mainViewModel;
+    private Binder<ViewModel> binder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        this.mainViewModel = new MainViewModel();
-        this.compositeDisposable = Binder.subscribe(this)
-                .to(mainViewModel)
-                .call();
+        this.binder = Binder.bind(this).to(new ViewModel());
     }
 
 
     @Override
     protected void onResume() {
         super.onResume();
-        this.mainViewModel.updateString();
-        this.mainViewModel.updateNumber();
+        this.binder.getSubscriptionsFactory().updateString();
+        this.binder.getSubscriptionsFactory().updateNumber();
     }
 
 
@@ -43,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     Disposable stringSubscriber(Subject<String> subject) {
         return subject.subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(v -> Log.e("MainActivity", "stringSubject : "+v));
+                .subscribe(v -> Log.e("MainActivity", "stringSubject : " + v));
     }
 
     @SubscribeTo("intSubject")
@@ -56,6 +51,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        compositeDisposable.clear();
+        this.binder.unbind();
     }
 }

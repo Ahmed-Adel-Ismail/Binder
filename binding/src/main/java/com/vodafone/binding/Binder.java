@@ -7,7 +7,6 @@ import com.vodafone.binding.annotations.SubscriptionName;
 import com.vodafone.binding.annotations.SubscriptionsFactory;
 
 import java.lang.reflect.Constructor;
-import java.util.concurrent.Callable;
 
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -22,37 +21,21 @@ import static com.vodafone.binding.annotations.GeneratedNames.GENERATED_SUBSCRIB
  * {@link CompositeDisposable#clear()} when you want to dispose all the {@link Disposable}
  * Objects that were created
  */
-public class Binder implements Callable<CompositeDisposable> {
+public class Binder<T> {
 
-    private final Object objectWithSubscribeToAnnotations;
-    private final Object objectWithSubscriptionNameAnnotations;
+    private final Object subscriber;
+    private final T subscriptionFactory;
+    private final CompositeDisposable compositeDisposable;
 
-    private Binder(Object objectWithSubscribeToAnnotations,
-                   Object objectWithSubscriptionNameAnnotations) {
-        this.objectWithSubscribeToAnnotations = objectWithSubscribeToAnnotations;
-        this.objectWithSubscriptionNameAnnotations = objectWithSubscriptionNameAnnotations;
+    private Binder(Object subscriber,
+                   T subscriptionFactory) {
+
+        this.subscriber = subscriber;
+        this.subscriptionFactory = subscriptionFactory;
+        this.compositeDisposable = createCompositeDisposable();
     }
 
-    /**
-     * subscribe the declared {@link SubscribeTo} annotated methods of the passed Object
-     *
-     * @param objectWithSubscribeToAnnotations the Object that holds {@link SubscribeTo} annotated
-     *                                         methods
-     * @return a {@link Binder.Builder} to complete the binding process
-     */
-    public static Builder subscribe(Object objectWithSubscribeToAnnotations) {
-        return new Builder(objectWithSubscribeToAnnotations);
-    }
-
-    /**
-     * bind the two Objects and generate a {@link CompositeDisposable} that holds all the
-     * {@link Disposable} Objects generated
-     *
-     * @return a {@link CompositeDisposable} that holds all the {@link Disposable} Objects, you can
-     * later call {@link CompositeDisposable#clear()}
-     */
-    @Override
-    public CompositeDisposable call() {
+    private CompositeDisposable createCompositeDisposable() {
         return Chain.let(subscribeToAnnotationsClassName())
                 .guardMap(this::invokeBinderCompositeDisposable)
                 .onErrorReturn(this::logErrorAndCreateEmptyCompositeDisposable)
@@ -61,7 +44,35 @@ public class Binder implements Callable<CompositeDisposable> {
     }
 
     private String subscribeToAnnotationsClassName() {
-        return objectWithSubscribeToAnnotations.getClass().getName() + GENERATED_SUBSCRIBERS_POSTFIX;
+        return subscriber.getClass().getName() + GENERATED_SUBSCRIBERS_POSTFIX;
+    }
+
+    /**
+     * bind the declared {@link SubscribeTo} annotated methods of the passed Object
+     *
+     * @param subscriber the Object that holds {@link SubscribeTo} annotated
+     *                   methods
+     * @return a {@link Binder.Builder} to complete the binding process
+     */
+    public static Builder bind(Object subscriber) {
+        return new Builder(subscriber);
+    }
+
+    /**
+     * get the Object mentioned in {@link SubscriptionsFactory},
+     * which holds the {@link SubscriptionName} annotations
+     *
+     * @return the Object that was mentioned in {@link SubscriptionsFactory}
+     */
+    public T getSubscriptionsFactory() {
+        return subscriptionFactory;
+    }
+
+    /**
+     * un-bind the Objects, this method clears every thing
+     */
+    public void unbind() {
+        this.compositeDisposable.clear();
     }
 
     private CompositeDisposable logErrorAndCreateEmptyCompositeDisposable(Throwable throwable) {
@@ -74,7 +85,7 @@ public class Binder implements Callable<CompositeDisposable> {
     @SuppressWarnings("unchecked")
     private Object invokeBinderCompositeDisposable(String className) throws Exception {
         return ((BiFunction) generateObject(className))
-                .apply(objectWithSubscribeToAnnotations, objectWithSubscriptionNameAnnotations);
+                .apply(subscriber, subscriptionFactory);
     }
 
     private static Object generateObject(String className) {
@@ -98,17 +109,17 @@ public class Binder implements Callable<CompositeDisposable> {
         }
 
         /**
-         * make the Object holding the {@link SubscribeTo} annotations to subscribe to a new
+         * make the Object holding the {@link SubscribeTo} annotations to bind to a new
          * instance of the class mentioned in {@link SubscriptionsFactory} ... make sure that
          * this class mentioned in the {@link SubscriptionsFactory} should have a default no-args
          * constructor
          *
-         * @return a {@link Binder} that it's {@link #call()} function will result in
-         * subscribing all the {@link SubscribeTo} methods to the {@link SubscriptionName} declared
-         * in the {@link SubscriptionsFactory} class
+         * @return a {@link Binder} that subscribes all the {@link SubscribeTo} methods to the
+         * {@link SubscriptionName} declared in the {@link SubscriptionsFactory} class
          */
-        public Binder toNewSubscriptionsFactory() {
-            return subscriptionFactoryClassName()
+        @SuppressWarnings("unchecked")
+        public <T> Binder<T> toNewSubscriptionsFactory() {
+            return (Binder<T>) subscriptionFactoryClassName()
                     .map(Binder::generateObject)
                     .map(this::createSubscriptionBinder)
                     .defaultIfEmpty(null)
@@ -124,28 +135,27 @@ public class Binder implements Callable<CompositeDisposable> {
                     .map(Class::getName);
         }
 
-        private Binder createSubscriptionBinder(
-                Object objectWithSubscriptionNameAnnotations) {
-
-            return new Binder(
+        private <T> Binder<T> createSubscriptionBinder(
+                T objectWithSubscriptionNameAnnotations) {
+            return new Binder<>(
                     objectWithSubscribeToAnnotations,
                     objectWithSubscriptionNameAnnotations);
         }
 
         /**
-         * pass the Object that holds the declared {@link SubscriptionName} annoteted fields or
+         * pass the Object that holds the declared {@link SubscriptionName} annotated fields or
          * methods, this step will create a {@link Binder} that holds both Objects to
          * bind
          *
-         * @param objectWithSubscriptionNameAnnotations the Object that holds
-         *                                              {@link SubscriptionName} on it's elements
-         * @return a {@link Binder} to complete the process when calling it's
-         * {@link Binder#call()}
+         * @param subscriptionsFactory the Object that holds
+         *                             {@link SubscriptionName} on it's elements
+         * @return a {@link Binder} to complete the process
          */
-        public Binder to(Object objectWithSubscriptionNameAnnotations) {
-            return subscriptionFactoryClassName()
-                    .when(objectWithSubscriptionNameAnnotations.getClass().getName()::equals)
-                    .thenTo(objectWithSubscriptionNameAnnotations)
+        @SuppressWarnings("unchecked")
+        public <T> Binder<T> to(Object subscriptionsFactory) {
+            return (Binder<T>) subscriptionFactoryClassName()
+                    .when(subscriptionsFactory.getClass().getName()::equals)
+                    .thenTo(subscriptionsFactory)
                     .map(this::createSubscriptionBinder)
                     .defaultIfEmpty(null)
                     .apply(this::crashIfNull)
@@ -155,7 +165,7 @@ public class Binder implements Callable<CompositeDisposable> {
         private void crashIfNull(Binder binder) {
             if (binder == null) {
                 throw new UnsupportedOperationException("Object passed to" +
-                        " [objectWithSubscriptionNameAnnotations] parameter is not the same type" +
+                        " [subscriptionFactory] parameter is not the same type" +
                         " as the one declared in @" + SubscriptionsFactory.class.getSimpleName() +
                         " ,make sure to declare the @" + SubscriptionsFactory.class.getSimpleName() +
                         " annotation above the Class that holds @" + SubscribeTo.class.getSimpleName() +

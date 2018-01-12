@@ -25,7 +25,7 @@ class BinderCodeGenerator implements Function<BoundTypes, GeneratedStrings> {
 
     private TypeSpec typeSpec(BoundTypes boundTypes) throws Exception {
         return new BinderFunction(boundTypes)
-                .apply(new BinderFunctionStatements(environment));
+                .apply(new BinderFunctionStatements());
     }
 
 

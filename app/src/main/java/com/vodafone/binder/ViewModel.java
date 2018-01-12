@@ -11,7 +11,7 @@ import io.reactivex.subjects.Subject;
  * Created by Ahmed Adel Ismail on 1/9/2018.
  */
 
-public class MainViewModel {
+public class ViewModel {
 
     @SubscriptionName("stringSubject")
     final Subject<String> stringSubject = BehaviorSubject.createDefault("");

@@ -34,9 +34,17 @@ class BoundElementsMerger implements Function<BoundElements, String> {
                 .and("(")
                 .and(VARIABLE_NAME_SUBSCRIPTIONS)
                 .and(".")
-                .and(boundElements.getSource().toString())
+                .and(sourceNameOrCrash(boundElements))
                 .and(")")
                 .reduce((leftString, rightString) -> leftString + rightString)
+                .call();
+    }
+
+    private String sourceNameOrCrash(BoundElements boundElements) {
+        return Chain.optional(boundElements)
+                .map(BoundElements::getSource)
+                .map(Object::toString)
+                .defaultIfEmpty(null)
                 .call();
     }
 }

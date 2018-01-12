@@ -35,6 +35,7 @@ public class BindingProcessor extends AbstractProcessor {
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
         super.init(processingEnvironment);
         this.processingEnvironment = processingEnvironment;
+        Log.setEnvironment(processingEnvironment);
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.vodafone.binding.processor;
 
+import com.vodafone.binding.annotations.SubscriptionName;
+
 import javax.lang.model.element.Element;
 
 /**
@@ -16,6 +18,16 @@ class BoundElements {
     BoundElements(Element source, Element subscriber) {
         this.source = source;
         this.subscriber = subscriber;
+
+        if (source == null) {
+            showNoSourceMappedError(subscriber);
+        }
+
+    }
+
+    private void showNoSourceMappedError(Element subscriber) {
+        Log.error("no @" + SubscriptionName.class.getSimpleName() +
+                " value mapped to " + subscriber.getSimpleName());
     }
 
     Element getSource() {
