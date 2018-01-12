@@ -1,0 +1,10 @@
+apply plugin: 'java-library'
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.github.Ahmed-Adel-Ismail:J-Chain:0.0.24'
+    compile project(':annotations')
+}
+
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
