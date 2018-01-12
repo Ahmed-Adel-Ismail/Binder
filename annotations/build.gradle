@@ -1,8 +1,10 @@
 apply plugin: 'java-library'
+apply plugin: 'maven'
+group = 'com.github.Ahmed-Adel-Ismail'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'io.reactivex.rxjava2:rxjava:2.1.8'
+    implementation 'io.reactivex.rxjava2:rxjava:2.1.8'
 }
 
 sourceCompatibility = "1.8"
