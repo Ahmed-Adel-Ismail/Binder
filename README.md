@@ -69,23 +69,26 @@ Then we declare our methods that will be invoked in the subscription process, li
     
 in our annotation <b>@SubscribeTo</b>, we pass the key that we declared in our <b>View-Model's @SubscriptionName</b> annotation, in this example we subscribe to the <b>Subject<String></b> that was declared in our <b>View-Model</b>
     
-after the annotation step, our method should be not-private, and it should return a Disposable, and it should expect a parameter of the same type of the declared variable in the <b>View-Model</b>
+after the annotation step, our method should be not-private, and it should return an <b>RxJava 2 Disposable</b>, and it should expect a parameter of the same type of the declared variable in the <b>View-Model</b>
 
-at the end we do the subscription process through calling the above lines :
+at the end we do the subscription process through calling the below lines :
 
     this.binder = Binder.bind(this).to(new ViewModel());
 
-the above code will do the subscription process and return a <b>CompositeDisposable</b> which will hold all the Diposables created by our methods, and we then can clear it in our <b>onDestroy()</b>
+the above code will do the binding process and return a <b>Binder</b> which will hold all the Diposables created by our methods, and we then can clear it in our <b>onDestroy()</b> by calling :
 
-if you wont hold reference to the Object holding the subscription sources (View-Model in our example), you can use the following lines instead :
+	this.binder.unbind();
+
+we can access the <b>View-Model</b> (our Subscriptions Factory) through this getter method :
+
+	this.binder.getSubscriptionsFactory();
+
+
+Another way to initialize the binding process is to invoke the below lines :
 
     this.binder = Binder.bind(this).toNewSubscriptionsFactory();
 
 this way, the <b>Binder</b> will create a new instance of the Class mentioned in the <b>@SubscriptionsFactory</b>, but this class should have a default no-args constructor
-
-You can access the <b>View-Model</b> (our Subscriptions Factory) through this getter method :
-
-	this.binder.getSubscriptionsFactory();
 
 # Summing up things
 
