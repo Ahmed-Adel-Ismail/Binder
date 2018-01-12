@@ -31,7 +31,7 @@ We need to put <b>@SubscriptionName</b> above the source that we need to receive
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             ...
-            this.binder = Binder.bind(this).to(new ViewModel());
+			this.binder = Binder.bind(this).to(new ViewModel());
 			// or :
 			// this.binder = Binder.bind(this).toNewSubscriptionsFactory();
         }
