@@ -65,7 +65,7 @@ The first step is to tell the Annotation Processor where it can find the Subscri
 Then we declare our methods that will be invoked in the subscription process, like the following method :
 
     @SubscribeTo("stringSubject")
-    Disposable stringSubscriber(Subject<String> stringSubject) {
+    Disposable stringSubscriber(Subject<String> subject) {
         return subject.subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(v -> Log.e("MainActivity", "stringSubject : "+v));
