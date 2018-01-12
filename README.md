@@ -116,3 +116,14 @@ Step 2. Add the dependency
 	    compile 'com.github.Ahmed-Adel-Ismail.Binder:binding:0.0.2'
         annotationProcessor 'com.github.Ahmed-Adel-Ismail.Binder:processor:0.0.2'
 	}
+	
+# Pro Guard Rules 
+
+For Pro Guard, you may need to add those lines in the proguard-rules file :
+	
+	-keep class java.lang.annotation.** { *; }
+	-keep class **$$Subscribers { *; }
+	-keepclassmembers class ** {
+  		@** *;
+	}
+	
