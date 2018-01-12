@@ -26,16 +26,12 @@ We need to put <b>@SubscriptionName</b> above the source that we need to receive
     @SubscriptionsFactory(ViewModel.class)
     public class MainActivity extends AppCompatActivity {
 
-        private CompositeDisposable compositeDisposable;
-        private ViewModel viewModel;
+        private Binder<ViewModel> binder;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             ...
-            this.viewModel = new ViewModel();
-            this.compositeDisposable = Binder.subscribe(this)
-                    .to(viewModel)
-                    .call();
+            this.binder = Binder.bind(this).to(new ViewModel());
         }
 
 
@@ -56,7 +52,7 @@ We need to put <b>@SubscriptionName</b> above the source that we need to receive
         @Override
         protected void onDestroy() {
             super.onDestroy();
-            compositeDisposable.clear();
+            this.binder.unbind();
         }
     }
 
@@ -77,19 +73,19 @@ after the annotation step, our method should be not-private, and it should retur
 
 at the end we do the subscription process through calling the above lines :
 
-    this.compositeDisposable = Binder.subscribe(this)
-            .to(mainViewModel)
-            .call();
+    this.binder = Binder.bind(this).to(new ViewModel());
 
 the above code will do the subscription process and return a <b>CompositeDisposable</b> which will hold all the Diposables created by our methods, and we then can clear it in our <b>onDestroy()</b>
 
 if you wont hold reference to the Object holding the subscription sources (View-Model in our example), you can use the following lines instead :
 
-    this.compositeDisposable = Binder.subscribe(this)
-            .toNewSubscriptionsFactory()
-            .call();
+    this.binder = Binder.bind(this).toNewSubscriptionsFactory();
 
 this way, the <b>Binder</b> will create a new instance of the Class mentioned in the <b>@SubscriptionsFactory</b>, but this class should have a default no-args constructor
+
+You can access the <b>View-Model</b> (our Subscriptions Factory) through this getter method :
+
+	this.binder.getSubscriptionsFactory();
 
 # Summing up things
 
