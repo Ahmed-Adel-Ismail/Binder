@@ -93,7 +93,7 @@ this way, the <b>Binder</b> will create a new instance of the Class mentioned in
 
 # Summing up things
 
-Although the example is on an MVVM pattern for Android, this can be applied to any two classes, so in our example, we can then Bind our <b>View-Model<b> to our <b>Inter-actor</b> or <b>Repositories</b>, and so on
+Although the example is on an MVVM pattern for Android, this can be applied to any two classes, so in our example, we can then Bind our <b>View-Model</b> to our <b>Inter-actor</b> or <b>Repositories</b>, and so on
     
 This library works with Java 8, which can be achieved for android by either working with Gradle 3+, or through using Retrolambda
 
