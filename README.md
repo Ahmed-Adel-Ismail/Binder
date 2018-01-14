@@ -31,9 +31,9 @@ We need to put <b>@SubscriptionName</b> above the source that we need to receive
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             ...
-		this.binder = Binder.bind(this).to(new ViewModel());
+		binder = Binder.bind(this).to(new ViewModel());
 		// or :
-		// this.binder = Binder.bind(this).toNewSubscriptionsFactory();
+		// binder = Binder.bind(this).toNewSubscriptionsFactory();
         }
 
 
@@ -54,7 +54,7 @@ We need to put <b>@SubscriptionName</b> above the source that we need to receive
         @Override
         protected void onDestroy() {
             super.onDestroy();
-            this.binder.unbind();
+            binder.unbind();
         }
     }
 
@@ -79,16 +79,16 @@ at the end we do the subscription process through calling the below lines :
 
 the above code will do the binding process and return a <b>Binder</b> which will hold all the Diposables created by our methods, and we then can clear it in our <b>onDestroy()</b> by calling :
 
-	this.binder.unbind();
+	binder.unbind();
 
 we can access the <b>View-Model</b> (our Subscriptions Factory) through this getter method :
 
-	this.binder.getSubscriptionsFactory();
+	binder.getSubscriptionsFactory();
 
 
 Another way to initialize the binding process is to invoke the below lines :
 
-    this.binder = Binder.bind(this).toNewSubscriptionsFactory();
+    binder = Binder.bind(this).toNewSubscriptionsFactory();
 
 this way, the <b>Binder</b> will create a new instance of the Class mentioned in the <b>@SubscriptionsFactory</b>, but this class should have a default no-args constructor
 
