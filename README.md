@@ -75,7 +75,7 @@ after the annotation step, our method should be not-private, and it should retur
 
 at the end we do the subscription process through calling the below lines :
 
-    this.binder = Binder.bind(this).to(new ViewModel());
+    binder = Binder.bind(this).to(new ViewModel());
 
 the above code will do the binding process and return a <b>Binder</b> which will hold all the Diposables created by our methods, and we then can clear it in our <b>onDestroy()</b> by calling :
 
