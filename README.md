@@ -114,8 +114,8 @@ Add it in your root build.gradle at the end of repositories:
 Step 2. Add the dependency
 
 	dependencies {
-	    compile 'com.github.Ahmed-Adel-Ismail.Binder:binding:0.0.3'
-        annotationProcessor 'com.github.Ahmed-Adel-Ismail.Binder:processor:0.0.3'
+	    compile 'com.github.Ahmed-Adel-Ismail.Binder:binding:0.0.4'
+        annotationProcessor 'com.github.Ahmed-Adel-Ismail.Binder:processor:0.0.4'
 	}
 	
 # Pro Guard Rules 

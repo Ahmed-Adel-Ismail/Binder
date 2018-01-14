@@ -11,6 +11,9 @@ import java.lang.reflect.Constructor;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
 
 import static com.vodafone.binding.annotations.GeneratedNames.GENERATED_SUBSCRIBERS_POSTFIX;
 
@@ -37,14 +40,100 @@ public class Binder<T> {
 
     private CompositeDisposable createCompositeDisposable() {
         return Chain.let(subscribeToAnnotationsClassName())
-                .guardMap(this::invokeBinderCompositeDisposable)
-                .onErrorReturn(this::logErrorAndCreateEmptyCompositeDisposable)
-                .map(object -> (CompositeDisposable) object)
+                .guardMap(toBinderWithCompositeDisposables())
+                .onErrorReturn(withLogErrorAndEmptyDisposable())
+                .map(toCompositeDisposable())
                 .call();
     }
 
     private String subscribeToAnnotationsClassName() {
         return subscriber.getClass().getName() + GENERATED_SUBSCRIBERS_POSTFIX;
+    }
+
+    private Function<String, Object> toBinderWithCompositeDisposables() {
+        return new Function<String, Object>() {
+            @Override
+            @SuppressWarnings("unchecked")
+            public Object apply(String className) throws Exception {
+                return ((BiFunction) generateObject(className))
+                        .apply(subscriber, subscriptionFactory);
+            }
+        };
+    }
+
+    private Function<Throwable, Object> withLogErrorAndEmptyDisposable() {
+        return new Function<Throwable, Object>() {
+            @Override
+            public Object apply(Throwable throwable) throws Exception {
+                return Chain.let(throwable)
+                        .apply(printStackTrace())
+                        .to(new CompositeDisposable())
+                        .call();
+            }
+        };
+    }
+
+    private Function<Object, CompositeDisposable> toCompositeDisposable() {
+        return new Function<Object, CompositeDisposable>() {
+            @Override
+            public CompositeDisposable apply(Object object) throws Exception {
+                return (CompositeDisposable) object;
+            }
+        };
+    }
+
+    private static Object generateObject(String className) {
+        return Chain.let(className)
+                .map(toClassName())
+                .map(toDeclaredConstructor())
+                .apply(makeAccessible())
+                .map(toNewInstance())
+                .call();
+    }
+
+    private Consumer<Throwable> printStackTrace() {
+        return new Consumer<Throwable>() {
+            @Override
+            public void accept(Throwable throwable) throws Exception {
+                throwable.printStackTrace();
+            }
+        };
+    }
+
+    private static Function<String, Class<?>> toClassName() {
+        return new Function<String, Class<?>>() {
+            @Override
+            public Class<?> apply(String className) throws Exception {
+                return Class.forName(className);
+            }
+        };
+    }
+
+    private static Function<Class<?>, Constructor> toDeclaredConstructor() {
+        return new Function<Class<?>, Constructor>() {
+            @Override
+            public Constructor apply(Class<?> clazz) throws Exception {
+                return clazz.getDeclaredConstructor();
+            }
+        };
+    }
+
+    private static Consumer<Constructor> makeAccessible() {
+        return new Consumer<Constructor>() {
+            @Override
+            public void accept(Constructor constructor) throws Exception {
+                constructor.setAccessible(true);
+            }
+        };
+    }
+
+    private static Function<Constructor, Object> toNewInstance() {
+        return new Function<Constructor, Object>() {
+            @Override
+            public Object apply(Constructor constructor) throws Exception {
+                return constructor.newInstance();
+            }
+        };
     }
 
     /**
@@ -75,28 +164,6 @@ public class Binder<T> {
         this.compositeDisposable.clear();
     }
 
-    private CompositeDisposable logErrorAndCreateEmptyCompositeDisposable(Throwable throwable) {
-        return Chain.let(throwable)
-                .apply(Throwable::printStackTrace)
-                .to(new CompositeDisposable())
-                .call();
-    }
-
-    @SuppressWarnings("unchecked")
-    private Object invokeBinderCompositeDisposable(String className) throws Exception {
-        return ((BiFunction) generateObject(className))
-                .apply(subscriber, subscriptionFactory);
-    }
-
-    private static Object generateObject(String className) {
-        return Chain.let(className)
-                .map(Class::forName)
-                .map(clazz -> clazz.getDeclaredConstructor())
-                .apply(constructor -> constructor.setAccessible(true))
-                .map(Constructor::newInstance)
-                .call();
-    }
-
     /**
      * a {@link Binder.Builder} to complete the binding process
      */
@@ -119,20 +186,39 @@ public class Binder<T> {
          */
         @SuppressWarnings("unchecked")
         public <T> Binder<T> toNewSubscriptionsFactory() {
-            return (Binder<T>) subscriptionFactoryClassName()
-                    .map(Binder::generateObject)
-                    .map(this::createSubscriptionBinder)
+            return subscriptionFactoryClassName()
+                    .map(toGeneratedObject())
+                    .map(new Function<Object, Binder<T>>() {
+                        @Override
+                        public Binder<T> apply(Object o) throws Exception {
+                            return (Binder<T>) createSubscriptionBinder(o);
+                        }
+                    })
                     .defaultIfEmpty(null)
-                    .apply(this::crashIfNull)
+                    .apply(new Consumer<Binder<T>>() {
+                        @Override
+                        public void accept(Binder<T> binder) throws Exception {
+                            crashIfNull(binder);
+                        }
+                    })
                     .call();
         }
 
         private Optional<String> subscriptionFactoryClassName() {
             return Chain.optional(objectWithSubscribeToAnnotations)
-                    .map(Object::getClass)
-                    .map(clazz -> clazz.getAnnotation(SubscriptionsFactory.class))
-                    .map(SubscriptionsFactory::value)
-                    .map(Class::getName);
+                    .map(toClass())
+                    .map(toSubscriptionFactoryAnnotation())
+                    .map(toSubscriptionFactoryValue())
+                    .map(toClassName());
+        }
+
+        private Function<String, Object> toGeneratedObject() {
+            return new Function<String, Object>() {
+                @Override
+                public Object apply(String className) throws Exception {
+                    return Binder.generateObject(className);
+                }
+            };
         }
 
         private <T> Binder<T> createSubscriptionBinder(
@@ -140,26 +226,6 @@ public class Binder<T> {
             return new Binder<>(
                     objectWithSubscribeToAnnotations,
                     objectWithSubscriptionNameAnnotations);
-        }
-
-        /**
-         * pass the Object that holds the declared {@link SubscriptionName} annotated fields or
-         * methods, this step will create a {@link Binder} that holds both Objects to
-         * bind
-         *
-         * @param subscriptionsFactory the Object that holds
-         *                             {@link SubscriptionName} on it's elements
-         * @return a {@link Binder} to complete the process
-         */
-        @SuppressWarnings("unchecked")
-        public <T> Binder<T> to(Object subscriptionsFactory) {
-            return (Binder<T>) subscriptionFactoryClassName()
-                    .when(subscriptionsFactory.getClass().getName()::equals)
-                    .thenTo(subscriptionsFactory)
-                    .map(this::createSubscriptionBinder)
-                    .defaultIfEmpty(null)
-                    .apply(this::crashIfNull)
-                    .call();
         }
 
         private void crashIfNull(Binder binder) {
@@ -172,6 +238,77 @@ public class Binder<T> {
                         " annotations, and that the Class declared in @" + SubscriptionsFactory.class.getSimpleName() +
                         " holds the members annotated with @" + SubscriptionName.class.getSimpleName());
             }
+        }
+
+        private Function<Object, Class<?>> toClass() {
+            return new Function<Object, Class<?>>() {
+                @Override
+                public Class<?> apply(Object o) throws Exception {
+                    return o.getClass();
+                }
+            };
+        }
+
+        private Function<Class<?>, SubscriptionsFactory> toSubscriptionFactoryAnnotation() {
+            return new Function<Class<?>, SubscriptionsFactory>() {
+                @Override
+                public SubscriptionsFactory apply(Class<?> clazz) throws Exception {
+                    return clazz.getAnnotation(SubscriptionsFactory.class);
+                }
+            };
+        }
+
+        private Function<SubscriptionsFactory, Class<?>> toSubscriptionFactoryValue() {
+            return new Function<SubscriptionsFactory, Class<?>>() {
+                @Override
+                public Class<?> apply(SubscriptionsFactory subscriptionsFactory) throws Exception {
+                    return subscriptionsFactory.value();
+                }
+            };
+        }
+
+        private Function<Class<?>, String> toClassName() {
+            return new Function<Class<?>, String>() {
+                @Override
+                public String apply(Class<?> clazz) throws Exception {
+                    return clazz.getName();
+                }
+            };
+        }
+
+        /**
+         * pass the Object that holds the declared {@link SubscriptionName} annotated fields or
+         * methods, this step will create a {@link Binder} that holds both Objects to
+         * bind
+         *
+         * @param subscriptionsFactory the Object that holds
+         *                             {@link SubscriptionName} on it's elements
+         * @return a {@link Binder} to complete the process
+         */
+        @SuppressWarnings("unchecked")
+        public <T> Binder<T> to(final Object subscriptionsFactory) {
+            return subscriptionFactoryClassName()
+                    .when(new Predicate<String>() {
+                        @Override
+                        public boolean test(String s) throws Exception {
+                            return subscriptionsFactory.getClass().getName().equals(s);
+                        }
+                    })
+                    .thenTo(subscriptionsFactory)
+                    .map(new Function<Object, Binder<T>>() {
+                        @Override
+                        public Binder<T> apply(Object o) throws Exception {
+                            return (Binder<T>) createSubscriptionBinder(o);
+                        }
+                    })
+                    .defaultIfEmpty(null)
+                    .apply(new Consumer<Binder<T>>() {
+                        @Override
+                        public void accept(Binder<T> o) throws Exception {
+                            crashIfNull(o);
+                        }
+                    })
+                    .call();
         }
     }
 }
