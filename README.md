@@ -5,7 +5,7 @@ An Annotation processor that allows binding two classes with each other, where t
 
 # Declaring the View-Model (Subscriptions source)
 
-    public class ViewModel {
+    public class ViewModel extends android.arch.lifecycle.ViewModel {
 
         @SubscriptionName("stringLiveData")
         final MutableLiveData<String> stringLiveData = new MutableLiveData<>();
