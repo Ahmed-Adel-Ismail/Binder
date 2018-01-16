@@ -186,7 +186,8 @@ public class Binder<T> {
          */
         @SuppressWarnings("unchecked")
         public <T> Binder<T> toNewSubscriptionsFactory() {
-            return subscriptionFactoryClassName()
+            return subscriptionsFactoryClass()
+                    .map(toClassName())
                     .map(toGeneratedObject())
                     .map(new Function<Object, Binder<T>>() {
                         @Override
@@ -204,12 +205,21 @@ public class Binder<T> {
                     .call();
         }
 
-        private Optional<String> subscriptionFactoryClassName() {
+
+        private Optional<Class<?>> subscriptionsFactoryClass() {
             return Chain.optional(objectWithSubscribeToAnnotations)
                     .map(toClass())
                     .map(toSubscriptionFactoryAnnotation())
-                    .map(toSubscriptionFactoryValue())
-                    .map(toClassName());
+                    .map(toSubscriptionFactoryValue());
+        }
+
+        private Function<Class<?>, String> toClassName() {
+            return new Function<Class<?>, String>() {
+                @Override
+                public String apply(Class<?> clazz) throws Exception {
+                    return clazz.getName();
+                }
+            };
         }
 
         private Function<String, Object> toGeneratedObject() {
@@ -267,15 +277,6 @@ public class Binder<T> {
             };
         }
 
-        private Function<Class<?>, String> toClassName() {
-            return new Function<Class<?>, String>() {
-                @Override
-                public String apply(Class<?> clazz) throws Exception {
-                    return clazz.getName();
-                }
-            };
-        }
-
         /**
          * pass the Object that holds the declared {@link SubscriptionName} annotated fields or
          * methods, this step will create a {@link Binder} that holds both Objects to
@@ -287,13 +288,9 @@ public class Binder<T> {
          */
         @SuppressWarnings("unchecked")
         public <T> Binder<T> to(final Object subscriptionsFactory) {
-            return subscriptionFactoryClassName()
-                    .when(new Predicate<String>() {
-                        @Override
-                        public boolean test(String s) throws Exception {
-                            return subscriptionsFactory.getClass().getName().equals(s);
-                        }
-                    })
+            return subscriptionsFactoryClass()
+                    .map(toClassName())
+                    .when(isSubscriptionFactoryClassName(subscriptionsFactory))
                     .thenTo(subscriptionsFactory)
                     .map(new Function<Object, Binder<T>>() {
                         @Override
@@ -310,5 +307,15 @@ public class Binder<T> {
                     })
                     .call();
         }
+
+        private Predicate<String> isSubscriptionFactoryClassName(final Object subscriptionsFactory) {
+            return new Predicate<String>() {
+                @Override
+                public boolean test(String s) throws Exception {
+                    return subscriptionsFactory.getClass().getName().equals(s);
+                }
+            };
+        }
+
     }
 }

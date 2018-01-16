@@ -1,21 +1,38 @@
 package com.vodafone.binder;
 
+import android.arch.lifecycle.MutableLiveData;
+
 import com.vodafone.binding.annotations.SubscriptionName;
 
-import java.util.Random;
-
-import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.properties.Property;
+import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
 
 /**
  * Created by Ahmed Adel Ismail on 1/9/2018.
  */
 
-public class ViewModel {
+public class ViewModel extends android.arch.lifecycle.ViewModel {
 
     @SubscriptionName("stringSubject")
-    final Subject<String> stringSubject = BehaviorSubject.createDefault("");
-    private final Subject<Integer> intSubject = BehaviorSubject.createDefault(0);
+    final Subject<String> stringSubject = PublishSubject.create();
+
+    @SubscriptionName("stringLiveData")
+    final MutableLiveData<String> stringLiveData = new MutableLiveData<>();
+
+    private final Subject<Integer> intSubject = PublishSubject.create();
+    private final Property<String> stringProperty = new Property<>();
+
+
+    @SubscriptionName("intSubject")
+    Subject<Integer> getIntSubject() {
+        return intSubject;
+    }
+
+    @SubscriptionName("stringProperty")
+    public Property<String> getStringProperty() {
+        return stringProperty;
+    }
 
     void updateString() {
         stringSubject.onNext(randomString());
@@ -26,16 +43,24 @@ public class ViewModel {
     }
 
     private int randomNumber() {
-        return new Random(10).nextInt();
+        return (int) (Math.random() * 1000);
     }
 
-    void updateNumber(){
+    void updateProperty() {
+        stringProperty.set(randomString());
+    }
+
+    void updateLiveData() {
+        stringLiveData.setValue(randomString());
+    }
+
+    void updateNumber() {
         intSubject.onNext(randomNumber());
     }
 
-    @SubscriptionName("intSubject")
-    Subject<Integer> getIntSubject(){
-        return intSubject;
+    void clear() {
+        stringProperty.clear();
     }
+
 
 }

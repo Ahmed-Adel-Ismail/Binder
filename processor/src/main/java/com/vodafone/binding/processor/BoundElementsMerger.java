@@ -5,6 +5,7 @@ import com.chaining.Chain;
 
 import javax.lang.model.element.ExecutableElement;
 
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 
 import static com.vodafone.binding.processor.BinderCodeGenerator.VARIABLE_NAME_DISPOSABLES;
@@ -15,20 +16,26 @@ class BoundElementsMerger implements Function<BoundElements, String> {
 
     @Override
     public String apply(BoundElements boundElements) {
-        return Chain.let(VARIABLE_NAME_DISPOSABLES)
-                .and(".add(")
-                .and(VARIABLE_NAME_SUBSCRIBER)
+        return Chain.let(boundElements)
+                .map(this::subscriberMethod)
+                .when(this::isReturningDisposable)
+                .thenTo(VARIABLE_NAME_DISPOSABLES + ".add(%s)")
+                .defaultIfEmpty("%s")
+                .call()
+                .replace("%s", subscriptionMethodCall(boundElements));
+    }
+
+    private String subscriptionMethodCall(BoundElements boundElements) {
+        return Chain.let(VARIABLE_NAME_SUBSCRIBER)
                 .and(".")
-                .and(callPassingSourceToSubscriberMethod(boundElements))
-                .and(")")
+                .and(passSourceToSubscriber(boundElements))
                 .reduce((leftString, rightString) -> leftString + rightString)
                 .call();
     }
 
-    private String callPassingSourceToSubscriberMethod(BoundElements boundElements) {
+    private String passSourceToSubscriber(BoundElements boundElements) {
         return Chain.let(boundElements)
-                .map(BoundElements::getSubscriber)
-                .map(element -> (ExecutableElement) element)
+                .map(this::subscriberMethod)
                 .map(ExecutableElement::getSimpleName)
                 .map(Object::toString)
                 .and("(")
@@ -46,5 +53,16 @@ class BoundElementsMerger implements Function<BoundElements, String> {
                 .map(Object::toString)
                 .defaultIfEmpty(null)
                 .call();
+    }
+
+    private ExecutableElement subscriberMethod(BoundElements boundElements) {
+        return Chain.let(boundElements)
+                .map(BoundElements::getSubscriber)
+                .map(element -> (ExecutableElement) element)
+                .call();
+    }
+
+    private boolean isReturningDisposable(ExecutableElement element) {
+        return Disposable.class.getName().equals(element.getReturnType().toString());
     }
 }
