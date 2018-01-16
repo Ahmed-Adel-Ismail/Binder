@@ -35,9 +35,9 @@ We need to put <b>@SubscriptionName</b> above the source that we need to receive
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             ...
-		    ViewModel viewModel = ViewModelProviders.of(this).get(ViewModel.class);
+            ViewModel viewModel = ViewModelProviders.of(this).get(ViewModel.class);
             binder = Binder.bind(this).to(viewModel);
-		}
+        }
 
 
         @SubscribeTo("stringLiveData")
