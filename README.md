@@ -23,7 +23,7 @@ An Annotation processor that allows binding two classes with each other, where t
 
     }
 
-We need to put <b>@SubscriptionName</b> above the source that we need to receive it's updates, weather on the non-private variable, or on the non-private getter, as shown above ... the value passed to the annotation should be unique per class, as shown in the example, the <b>stringLiveData</b> variable is annotated with <b>@SubscriptionName("stringLiveData")</b>, and the intSubject getter is annotated with <b>@SubscriptionName("intSubject")</b>, the values "stringSubject" and "intSubject" are unique, if one is repeated, an error will occur during compilation
+We need to put <b>@SubscriptionName</b> above the source that we need to receive it's updates, weather on the non-private variable, or on the non-private getter, as shown above ... the value passed to the annotation should be unique per class, as shown in the example, the <b>stringLiveData</b> variable is annotated with <b>@SubscriptionName("stringLiveData")</b>, and the <b>intSubject</b> getter is annotated with <b>@SubscriptionName("intSubject")</b>, the values "stringSubject" and "intSubject" are unique, if one is repeated, an error will occur during compilation
 
 # Declaring our View (Subscribers)
 
