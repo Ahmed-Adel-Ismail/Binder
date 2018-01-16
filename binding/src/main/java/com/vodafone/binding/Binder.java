@@ -27,14 +27,14 @@ import static com.vodafone.binding.annotations.GeneratedNames.GENERATED_SUBSCRIB
 public class Binder<T> {
 
     private final Object subscriber;
-    private final T subscriptionFactory;
+    private final T subscriptionsFactory;
     private final CompositeDisposable compositeDisposable;
 
     private Binder(Object subscriber,
-                   T subscriptionFactory) {
+                   T subscriptionsFactory) {
 
         this.subscriber = subscriber;
-        this.subscriptionFactory = subscriptionFactory;
+        this.subscriptionsFactory = subscriptionsFactory;
         this.compositeDisposable = createCompositeDisposable();
     }
 
@@ -56,7 +56,7 @@ public class Binder<T> {
             @SuppressWarnings("unchecked")
             public Object apply(String className) throws Exception {
                 return ((BiFunction) generateObject(className))
-                        .apply(subscriber, subscriptionFactory);
+                        .apply(subscriber, subscriptionsFactory);
             }
         };
     }
@@ -154,7 +154,7 @@ public class Binder<T> {
      * @return the Object that was mentioned in {@link SubscriptionsFactory}
      */
     public T getSubscriptionsFactory() {
-        return subscriptionFactory;
+        return subscriptionsFactory;
     }
 
     /**
@@ -241,7 +241,7 @@ public class Binder<T> {
         private void crashIfNull(Binder binder) {
             if (binder == null) {
                 throw new UnsupportedOperationException("Object passed to" +
-                        " [subscriptionFactory] parameter is not the same type" +
+                        " [subscriptionsFactory] parameter is not the same type" +
                         " as the one declared in @" + SubscriptionsFactory.class.getSimpleName() +
                         " ,make sure to declare the @" + SubscriptionsFactory.class.getSimpleName() +
                         " annotation above the Class that holds @" + SubscribeTo.class.getSimpleName() +

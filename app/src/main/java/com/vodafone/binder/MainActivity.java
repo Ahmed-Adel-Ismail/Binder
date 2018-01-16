@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         ViewModel viewModel = ViewModelProviders.of(this).get(ViewModel.class);
-        this.binder = Binder.bind(this).to(viewModel);
+        binder = Binder.bind(this).to(viewModel);
 
     }
 
@@ -57,7 +57,8 @@ public class MainActivity extends AppCompatActivity {
 
     @SubscribeTo("stringLiveData")
     void stringLiveDataSubscriber(MutableLiveData<String> liveData) {
-        liveData.observe(this, text -> Log.e("MainActivity", "liveData : " + text));
+        liveData.observe(this,
+                text -> Log.e("MainActivity", "liveData : " + text));
     }
 
     @SubscribeTo("stringProperty")
