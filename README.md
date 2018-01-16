@@ -85,9 +85,9 @@ in our annotation <b>@SubscribeTo</b>, we pass the key that we declared in our <
 after the annotation step, our method should be : 
 
     - not private
-    - it can return an <b>RxJava 2 Disposable</b> to be able to dispose it in <b>Binder.unbind()</b>
-    - or it can return any other type (or void), but in this case it will be called once in the binding process and will not be affected by the call to <b>Binder.unbind()</b> (which is exactly what we want with LiveData in Android)
-    - it should expect a parameter of the same type of the declared variable in the <b>View-Model</b>
+    - it can return an RxJava 2 Disposable to be able to dispose it in Binder.unbind()
+    - it can return any other type (or void), but in this case it's return value will be ignored and will not be affected by the call to Binder.unbind() (which is exactly what we want with LiveData in Android)
+    - it should expect a parameter of the same type of the declared variable in the View-Model
 
 at the end we do the subscription process through calling the below lines :
 
