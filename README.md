@@ -42,8 +42,7 @@ We need to put <b>@SubscriptionName</b> above the source that we need to receive
 
         @SubscribeTo("stringLiveData")
         void stringLiveDataSubscriber(MutableLiveData<String> liveData) {
-            liveData.observe(this, 
-                    text -> Log.e("MainActivity", "liveData : " + text));
+            liveData.observe(this, text -> Log.e("MainActivity", "liveData : " + text));
         }
 
         @SubscribeTo("intSubject")
@@ -69,17 +68,16 @@ The first step is to tell the Annotation Processor where it can find the Subscri
 
 Then we declare our methods that will be invoked in the subscription process, like the following method :
 
+    @SubscribeTo("stringLiveData")
+    void stringLiveDataSubscriber(MutableLiveData<String> liveData) {
+        liveData.observe(this, text -> Log.e("MainActivity", "liveData : " + text));
+    }
+    
     @SubscribeTo("intSubject")
     Disposable intSubscriber(Subject<Integer> subject) {
         return subject.subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(v -> Log.e("MainActivity", "intSubject : " + v));
-    }
-    
-    @SubscribeTo("stringLiveData")
-    void stringLiveDataSubscriber(MutableLiveData<String> liveData) {
-        liveData.observe(this, 
-                text -> Log.e("MainActivity", "liveData : " + text));
     }
     
 in our annotation <b>@SubscribeTo</b>, we pass the key that we declared in our <b>View-Model's @SubscriptionName</b> annotation, in this example we subscribe to the <b>Subject<Integer> intSubject</b> that was declared in our <b>View-Model</b>
