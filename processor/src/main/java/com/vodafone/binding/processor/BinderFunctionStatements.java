@@ -30,7 +30,7 @@ class BinderFunctionStatements implements Function<BoundTypes, List<String>> {
         return Chain.let(new ArrayList<String>())
                 .apply(lines -> lines.add(declareCompositeDisposable()))
                 .apply(lines -> lines.add(initializeCompositeDisposable()))
-                .apply(lines -> lines.addAll(addMethodsToCompositeDisposable(boundTypes)))
+                .apply(lines -> lines.addAll(invokeAnnotatedMethods(boundTypes)))
                 .apply(lines -> lines.add(returnCompositeDisposables()))
                 .call();
     }
@@ -43,7 +43,7 @@ class BinderFunctionStatements implements Function<BoundTypes, List<String>> {
         return VARIABLE_NAME_DISPOSABLES + " = new " + CompositeDisposable.class.getName() + "()";
     }
 
-    private List<String> addMethodsToCompositeDisposable(BoundTypes boundTypes) {
+    private List<String> invokeAnnotatedMethods(BoundTypes boundTypes) {
         return Observable.just(subscribersMap(boundTypes))
                 .map(Map::entrySet)
                 .flatMap(Observable::fromIterable)
@@ -70,8 +70,8 @@ class BinderFunctionStatements implements Function<BoundTypes, List<String>> {
 
     private Map<String, ? extends Element> sourcesMap(BoundTypes boundTypes) {
         return Chain.let(sourceObservables(boundTypes))
-                .apply(observable -> showErrorOnEmptySubscriptionSource(boundTypes, observable))
-                .apply(observable -> showErrorOnDuplicateAnnotationValues(boundTypes, observable))
+                .apply(Curry.toConsumer(this::showErrorOnEmptySubscriptionSource, boundTypes))
+                .apply(Curry.toConsumer(this::showErrorOnDuplicateAnnotationValues, boundTypes))
                 .call()
                 .toMap(this::bySubscriptionNameValue)
                 .blockingGet();
