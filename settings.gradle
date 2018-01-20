@@ -1,1 +1,1 @@
-include ':app', ':DynamicReceiver'
+include ':app', ':processor', ':binding', ':annotations'
