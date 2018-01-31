@@ -1,16 +1,14 @@
 package com.vodafone.binder;
 
 import android.arch.lifecycle.MutableLiveData;
+import android.util.Log;
 
+import com.android.binding.Clear;
 import com.vodafone.binding.annotations.SubscriptionName;
 
 import io.reactivex.properties.Property;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
-
-/**
- * Created by Ahmed Adel Ismail on 1/9/2018.
- */
 
 public class ViewModel extends android.arch.lifecycle.ViewModel {
 
@@ -23,6 +21,17 @@ public class ViewModel extends android.arch.lifecycle.ViewModel {
     private final Subject<Integer> intSubject = PublishSubject.create();
     private final Property<String> stringProperty = new Property<>();
 
+    @SubscriptionName("updateData")
+    final Subject<Boolean> updateData = PublishSubject.create();
+
+
+    public ViewModel() {
+        updateData.share()
+                .doOnNext(trigger -> updateString())
+                .doOnNext(trigger -> updateProperty())
+                .doOnNext(trigger -> updateLiveData())
+                .subscribe(trigger -> updateNumber());
+    }
 
     @SubscriptionName("intSubject")
     Subject<Integer> getIntSubject() {
@@ -34,7 +43,7 @@ public class ViewModel extends android.arch.lifecycle.ViewModel {
         return stringProperty;
     }
 
-    void updateString() {
+    private void updateString() {
         stringSubject.onNext(randomString());
     }
 
@@ -46,20 +55,25 @@ public class ViewModel extends android.arch.lifecycle.ViewModel {
         return (int) (Math.random() * 1000);
     }
 
-    void updateProperty() {
+    private void updateProperty() {
         stringProperty.set(randomString());
     }
 
-    void updateLiveData() {
+    private void updateLiveData() {
         stringLiveData.setValue(randomString());
     }
 
-    void updateNumber() {
+    private void updateNumber() {
         intSubject.onNext(randomNumber());
     }
 
+    @Clear
     void clear() {
+        updateData.onComplete();
+        intSubject.onComplete();
+        stringSubject.onComplete();
         stringProperty.clear();
+        Log.e("ViewModel", "clear() invoked");
     }
 
 
