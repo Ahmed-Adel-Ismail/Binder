@@ -17,6 +17,11 @@ android {
 
     }
 
+    compileOptions {
+        sourceCompatibility = "1.7"
+        targetCompatibility = "1.7"
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -36,6 +41,6 @@ dependencies {
     annotationProcessor "android.arch.lifecycle:compiler:1.1.0"
     implementation 'io.reactivex.rxjava2:rxjava:2.1.8'
 
-    compile project(':annotations')
-    compile project(':binding')
+    api project(':annotations')
+    api project(':binding')
 }
