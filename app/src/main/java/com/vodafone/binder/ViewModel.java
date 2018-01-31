@@ -3,7 +3,7 @@ package com.vodafone.binder;
 import android.arch.lifecycle.MutableLiveData;
 import android.util.Log;
 
-import com.android.binding.Clear;
+import com.android.binding.OnSubscriptionsClosed;
 import com.vodafone.binding.annotations.SubscriptionName;
 
 import io.reactivex.properties.Property;
@@ -67,7 +67,7 @@ public class ViewModel extends android.arch.lifecycle.ViewModel {
         intSubject.onNext(randomNumber());
     }
 
-    @Clear
+    @OnSubscriptionsClosed
     void clear() {
         updateData.onComplete();
         intSubject.onComplete();

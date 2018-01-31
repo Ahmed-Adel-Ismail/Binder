@@ -36,14 +36,16 @@ public class MainActivity extends AppCompatActivity {
 
     @SubscribeTo("stringSubject")
     Disposable stringSubscriber(Subject<String> subject) {
-        return subject.subscribeOn(Schedulers.computation())
+        return subject.share()
+                .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(v -> Log.e("MainActivity", "stringSubject : " + v));
     }
 
     @SubscribeTo("intSubject")
     Disposable intSubscriber(Subject<Integer> subject) {
-        return subject.subscribeOn(Schedulers.computation())
+        return subject.share()
+                .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(v -> Log.e("MainActivity", "intSubject : " + v));
     }

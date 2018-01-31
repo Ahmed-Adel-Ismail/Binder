@@ -38,8 +38,10 @@ class BindingInitializer implements Consumer<Object> {
     }
 
     private Binder<Object> bind(Object owner) throws Exception {
-        return Binder.bind(owner).to(subscriptionsFactory(owner, subscriptionFactoryClass(owner)));
+        return Binder.bind(owner)
+                .to(subscriptionsFactory(owner, subscriptionFactoryClass(owner)));
     }
+
 
     private void registerFragmentsLifeCycleCallbacks(FragmentActivity activity) {
         FragmentManager fragmentManager = activity.getSupportFragmentManager();
@@ -53,7 +55,8 @@ class BindingInitializer implements Consumer<Object> {
         if (owner instanceof SubscriptionFactoryProvider) {
             return ((SubscriptionFactoryProvider) owner).subscriptionFactory();
         } else if (ViewModel.class.isAssignableFrom(factoryClass)) {
-            return createViewModel(owner, factoryClass);
+            return ViewModelProviders.of(ownerActivity(owner))
+                    .get(viewModelClass(factoryClass));
         } else {
             return createNewSubscriptionsFactory(factoryClass);
         }
@@ -64,41 +67,20 @@ class BindingInitializer implements Consumer<Object> {
         return owner.getClass().getAnnotation(SubscriptionsFactory.class).value();
     }
 
+    private FragmentActivity ownerActivity(Object owner) {
+        return (owner instanceof Fragment)
+                ? ((Fragment) owner).getActivity()
+                : (FragmentActivity) owner;
+    }
 
-    @NonNull
-    private ViewModel createViewModel(Object owner, Class<?> subscriptionFactory) {
-        if (owner instanceof FragmentActivity) {
-            return activityViewModel(owner, subscriptionFactory);
-        } else if (owner instanceof Fragment) {
-            return fragmentViewModel(owner, subscriptionFactory);
-        } else {
-            throw new UnsupportedOperationException("The Annotated Class with " +
-                    SubscriptionsFactory.class.getSimpleName() + "must be either a " +
-                    "FragmentActivity (which is the parent of AppCompatActivity) " +
-                    "or an android.support.v4.app.Fragment");
-        }
+    @SuppressWarnings("unchecked")
+    private Class<? extends ViewModel> viewModelClass(Class<?> subscriptionFactory) {
+        return (Class<? extends ViewModel>) subscriptionFactory;
     }
 
     private Object createNewSubscriptionsFactory(Class<?> factoryClass) throws Exception {
         Constructor constructor = factoryClass.getDeclaredConstructor();
         constructor.setAccessible(true);
         return constructor.newInstance();
-    }
-
-    @NonNull
-    private ViewModel activityViewModel(Object owner, Class<?> subscriptionFactory) {
-        return ViewModelProviders.of((FragmentActivity) owner)
-                .get(viewModelClass(subscriptionFactory));
-    }
-
-    @NonNull
-    private ViewModel fragmentViewModel(Object owner, Class<?> subscriptionFactory) {
-        return ViewModelProviders.of((Fragment) owner)
-                .get(viewModelClass(subscriptionFactory));
-    }
-
-    @SuppressWarnings("unchecked")
-    private Class<? extends ViewModel> viewModelClass(Class<?> subscriptionFactory) {
-        return (Class<? extends ViewModel>) subscriptionFactory;
     }
 }

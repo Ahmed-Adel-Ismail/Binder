@@ -17,7 +17,7 @@ import io.reactivex.functions.Consumer;
 class BindingClearer implements Consumer<Object> {
 
     @Override
-    public void accept(Object owner) throws Exception {
+    public void accept(Object owner) {
         Binder<?> binder = BindersCache.remove(owner);
         if (binder != null) {
             unbindAndInvokeClearOnFinishing(owner, binder);
@@ -25,14 +25,19 @@ class BindingClearer implements Consumer<Object> {
     }
 
 
-    private void unbindAndInvokeClearOnFinishing(Object owner, Binder<?> binder) throws Exception {
+    private void unbindAndInvokeClearOnFinishing(Object owner, Binder<?> binder) {
         binder.unbind();
         invokeClearOnFinishing(owner, binder);
     }
 
-    private void invokeClearOnFinishing(Object owner, Binder<?> binder) throws Exception {
+    private void invokeClearOnFinishing(Object owner, Binder<?> binder) {
         if (isActivityFinishing(owner) || isFragmentFinishing(owner)) {
-            invokeClearMethodIfDeclared(binder);
+            try {
+                invokeClearMethodIfDeclared(binder);
+            } catch (Exception e) {
+                // can be caused during duplicate call to the @OnSubscriptionsClosed method, for
+                // shared ViewModels
+            }
         }
     }
 
@@ -55,7 +60,7 @@ class BindingClearer implements Consumer<Object> {
     }
 
     private boolean invokeClearMethod(Object subscriptionFactory, Method method) throws Exception {
-        if (method.isAnnotationPresent(Clear.class)) {
+        if (method.isAnnotationPresent(OnSubscriptionsClosed.class)) {
             method.setAccessible(true);
             method.invoke(subscriptionFactory);
             return true;

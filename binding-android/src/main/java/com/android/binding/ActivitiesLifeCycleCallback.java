@@ -49,11 +49,7 @@ class ActivitiesLifeCycleCallback implements Application.ActivityLifecycleCallba
 
     @Override
     public void onActivityDestroyed(Activity activity) {
-        try {
-            new BindingClearer().accept(activity);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        new BindingClearer().accept(activity);
     }
 
 }

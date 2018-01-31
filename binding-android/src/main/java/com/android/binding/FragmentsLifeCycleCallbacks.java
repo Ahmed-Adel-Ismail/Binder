@@ -24,10 +24,6 @@ class FragmentsLifeCycleCallbacks extends FragmentManager.FragmentLifecycleCallb
 
     @Override
     public void onFragmentDestroyed(FragmentManager fm, Fragment f) {
-        try {
-            new BindingClearer().accept(f);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        new BindingClearer().accept(f);
     }
 }
