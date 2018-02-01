@@ -130,8 +130,8 @@ Add it in your root build.gradle at the end of repositories:
 Step 2. Add the dependency
 
 	dependencies {
-	    compile 'com.github.Ahmed-Adel-Ismail.Binder:binding:0.0.5'
-        annotationProcessor 'com.github.Ahmed-Adel-Ismail.Binder:processor:0.0.5'
+	    compile 'com.github.Ahmed-Adel-Ismail.Binder:binding:0.1.0'
+        annotationProcessor 'com.github.Ahmed-Adel-Ismail.Binder:processor:0.1.0'
 	}
 	
 # Pro Guard Rules 
@@ -144,3 +144,105 @@ For Pro Guard, you may need to add those lines in the proguard-rules file :
   		@** *;
 	}
 	
+# Android Support
+
+starting from version 0.1.0, there is Support for Android as follows :
+
+# Gradle Dependency for Android
+
+	dependencies {
+	    compile 'com.github.Ahmed-Adel-Ismail.Binder:binding:0.1.0'
+        annotationProcessor 'com.github.Ahmed-Adel-Ismail.Binder:processor:0.1.0'
+	}
+
+# Update your Application class 
+
+	@Override
+    public void onCreate() {
+        super.onCreate();
+        Binding.integrate(this);
+    }
+	
+# Implement MVVM with Binding processor on Activities and Fragments
+
+You do not need to handle the Binding operations any more, just declare the annotations in your <b>Activity</b> or <b>android.support.v4.app.Fragment</b> as follows :
+
+	@SubscriptionsFactory(MainViewModel.class)
+	public class MainActivity extends AppCompatActivity {
+
+		@Override
+		protected void onCreate(@Nullable Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			setContentView(R.layout.activity_main);
+		}
+
+		@SubscribeTo("stringSubject")
+		Disposable stringSubscriber(Subject<String> subject) {
+			return subject.share()
+					.subscribeOn(Schedulers.computation())
+					.observeOn(AndroidSchedulers.mainThread())
+					.subscribe(v -> Log.e("MainActivity", "stringSubject : " + v));
+		}
+	}
+	
+	
+	@SubscriptionsFactory(MainViewModel.class)
+	public class MainFragment extends Fragment {
+
+		@Nullable
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+			super.onCreateView(inflater, container, savedInstanceState);
+			return inflater.inflate(R.layout.fragment_main,container);
+		}
+
+		@SubscribeTo("stringSubject")
+		Disposable stringSubscriber(Subject<String> subject) {
+			return subject.share()
+					.subscribeOn(Schedulers.computation())
+					.observeOn(AndroidSchedulers.mainThread())
+					.subscribe(v -> Log.e("MainFragment", "stringSubject : " + v));
+		}
+	}
+
+And declare the annotations in your ViewModel as follows :
+
+	public class MainViewModel extends android.arch.lifecycle.ViewModel {
+
+		@SubscriptionName("stringSubject")
+		final Subject<String> stringSubject = PublishSubject.create();
+		
+		void clear(){
+			stringSubject.onComplete();
+		}	
+	}
+	
+Since the <b>MainViewModel</b> extends the new Architecture components <b>ViewModel</b>, it will be shared accross all the Fragments and there Activity, if it does not extend the <b>android.arch.lifecycle.ViewModel</b>, a new instance will be created for each, which means that an instance will be created for The MainActivity, and another will be created to MainFragment
+
+If you want the <b>MainViewModel</b> to not extend the <b>android.arch.lifecycle.ViewModel</b>, and be shared between the Activity and it's Fragments, you can annotate the class with <b>@SharedSubscriptionFactory</b>, as follows :
+
+	@SharedSubscriptionFactory
+	public class MainViewModel {
+
+		@SubscriptionName("stringSubject")
+		final Subject<String> stringSubject = PublishSubject.create();
+		
+		void clear(){
+			stringSubject.onComplete();
+		}
+	}
+	
+if you have a method that will clear / destroy your <b>ViewModel</b>, like the <i>clear()</i> method in the <b>MainViewModel</b>, you can annotate it with <b>@OnSubscriptionsClosed</b>, this will cause the <b>Binder</b> to call it when the Activity / Fragment is totally destroyed (not rotating), and if this ViewModel is shared between Activity and it's Fragments, this method will be invoked when the Activity is totally destroyed (not rotating), so our <b>ViewModel</b> will look like this :
+
+	public class MainViewModel {
+
+		@SubscriptionName("stringSubject")
+		final Subject<String> stringSubject = PublishSubject.create();
+		
+		@OnSubscriptionsClosed
+		void clear(){
+			stringSubject.onComplete();
+		}
+	}
+	
+Notice that <b>@OnSubscriptionsClosed</b> will cause the <i>clear()</i> method to be invoked on any type of <b>ViewModel</b>
