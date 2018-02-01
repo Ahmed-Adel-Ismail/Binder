@@ -134,16 +134,6 @@ Step 2. Add the dependency
         annotationProcessor 'com.github.Ahmed-Adel-Ismail.Binder:processor:0.1.0'
 	}
 	
-# Pro Guard Rules 
-
-For Pro Guard, you may need to add those lines in the proguard-rules file :
-	
-	-keep class java.lang.annotation.** { *; }
-	-keep class **$$Subscribers { *; }
-	-keepclassmembers class ** {
-  		@** *;
-	}
-	
 # Android Support
 
 starting from version 0.1.0, there is Support for Android as follows :
@@ -246,3 +236,15 @@ if you have a method that will clear / destroy your <b>ViewModel</b>, like the <
 	}
 	
 Notice that <b>@OnSubscriptionsClosed</b> will cause the <i>clear()</i> method to be invoked on any type of <b>ViewModel</b>
+
+# Pro Guard Rules 
+
+For Pro Guard, you may need to add those lines in the proguard-rules file :
+	
+	-keep class java.lang.annotation.** { *; }
+	-keep class **$$Subscribers { *; }
+	-keepclassmembers class ** {
+  		@** *;
+	}
+
+* For Pro Guard rules, I'm waiting for your feed-back as this is under development still
