@@ -57,9 +57,19 @@ class BindingInitializer implements Consumer<Object> {
         } else if (ViewModel.class.isAssignableFrom(factoryClass)) {
             return ViewModelProviders.of(ownerActivity(owner))
                     .get(viewModelClass(factoryClass));
+        } else if (factoryClass.isAnnotationPresent(SharedSubscriptionFactory.class)) {
+            return reuseOrCreateSubscriptionsFactory(factoryClass);
         } else {
             return createNewSubscriptionsFactory(factoryClass);
         }
+    }
+
+    private Object reuseOrCreateSubscriptionsFactory(Class<?> factoryClass) throws Exception {
+        Object factory = BindersCache.getSubscriptionsFactoryOrNull(factoryClass);
+        if (factory == null) {
+            factory = createNewSubscriptionsFactory(factoryClass);
+        }
+        return factory;
     }
 
     @NonNull

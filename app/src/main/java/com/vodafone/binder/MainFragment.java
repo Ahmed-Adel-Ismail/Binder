@@ -34,5 +34,10 @@ public class MainFragment extends Fragment {
                 .subscribe(v -> Log.e("MainFragment", "stringSubject : " + v));
     }
 
+    @SubscribeTo("ownerName")
+    void updateOwnerName(Subject<String> ownerName){
+        ownerName.onNext(getClass().getSimpleName());
+    }
+
 
 }

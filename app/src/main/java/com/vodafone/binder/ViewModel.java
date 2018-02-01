@@ -4,13 +4,16 @@ import android.arch.lifecycle.MutableLiveData;
 import android.util.Log;
 
 import com.android.binding.OnSubscriptionsClosed;
+import com.android.binding.SharedSubscriptionFactory;
 import com.vodafone.binding.annotations.SubscriptionName;
 
 import io.reactivex.properties.Property;
+import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
 
-public class ViewModel extends android.arch.lifecycle.ViewModel {
+@SharedSubscriptionFactory
+public class ViewModel {
 
     @SubscriptionName("stringSubject")
     final Subject<String> stringSubject = PublishSubject.create();
@@ -23,6 +26,9 @@ public class ViewModel extends android.arch.lifecycle.ViewModel {
 
     @SubscriptionName("updateData")
     final Subject<Boolean> updateData = PublishSubject.create();
+
+    @SubscriptionName("ownerName")
+    final BehaviorSubject<String> ownerName = BehaviorSubject.create();
 
 
     public ViewModel() {
@@ -73,7 +79,8 @@ public class ViewModel extends android.arch.lifecycle.ViewModel {
         intSubject.onComplete();
         stringSubject.onComplete();
         stringProperty.clear();
-        Log.e("ViewModel", "clear() invoked");
+        Log.e("ViewModel", "onSubscriptionsClosed() : "+ownerName.getValue());
+        ownerName.onComplete();
     }
 
 

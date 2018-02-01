@@ -41,7 +41,7 @@ dependencies {
     implementation project(':android')
     annotationProcessor project(':processor')
 
-//    implementation 'com.github.Ahmed-Adel-Ismail.Binder:binding:0.0.7'
-//    compile 'com.github.Ahmed-Adel-Ismail.Binder:binding-android:0.0.8'
-//    annotationProcessor 'com.github.Ahmed-Adel-Ismail.Binder:processor:0.0.8'
+//    implementation 'com.github.Ahmed-Adel-Ismail.Binder:binding:0.0.10'
+//    implementation 'com.github.Ahmed-Adel-Ismail.Binder:android:0.0.10'
+//    annotationProcessor 'com.github.Ahmed-Adel-Ismail.Binder:processor:0.0.10'
 }

@@ -26,6 +26,7 @@ import static com.vodafone.binding.annotations.GeneratedNames.GENERATED_SUBSCRIB
  */
 public class Binder<T> {
 
+    private final long id = (long) (Math.random() * 999999);
     private final Object subscriber;
     private final T subscriptionsFactory;
     private final CompositeDisposable compositeDisposable;
@@ -162,6 +163,34 @@ public class Binder<T> {
      */
     public void unbind() {
         this.compositeDisposable.clear();
+    }
+
+    /**
+     * used internally by the library
+     *
+     * @return the ID of the binder
+     */
+    public long getId() {
+        return id;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = subscriber.hashCode();
+        result = 31 * result + subscriptionsFactory.hashCode();
+        result = 31 * result + compositeDisposable.hashCode();
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Binder)) return false;
+
+        Binder<?> binder = (Binder<?>) o;
+        return subscriber.equals(binder.subscriber)
+                && subscriptionsFactory.equals(binder.subscriptionsFactory)
+                && compositeDisposable.equals(binder.compositeDisposable);
     }
 
     /**

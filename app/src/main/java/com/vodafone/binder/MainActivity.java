@@ -64,4 +64,9 @@ public class MainActivity extends AppCompatActivity {
                 .subscribe(v -> Log.e("MainActivity", "stringProperty : " + v));
     }
 
+    @SubscribeTo("ownerName")
+    void updateOwnerName(Subject<String> ownerName){
+        ownerName.onNext(getClass().getSimpleName());
+    }
+
 }

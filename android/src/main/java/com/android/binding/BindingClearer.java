@@ -31,7 +31,7 @@ class BindingClearer implements Consumer<Object> {
     }
 
     private void invokeClearOnFinishing(Object owner, Binder<?> binder) {
-        if (isActivityFinishing(owner) || isFragmentFinishing(owner)) {
+        if (isActivityFinishing(owner) || isFragmentFinishing(owner, binder)) {
             try {
                 invokeClearMethodIfDeclared(binder);
             } catch (Exception e) {
@@ -45,8 +45,10 @@ class BindingClearer implements Consumer<Object> {
         return owner instanceof Activity && ((Activity) owner).isFinishing();
     }
 
-    private boolean isFragmentFinishing(Object owner) {
-        return owner instanceof Fragment && (((Fragment) owner).getActivity() == null
+    private boolean isFragmentFinishing(Object owner, Binder binder) {
+        return !BindersCache.isCommonSubscriptionsFactory(binder)
+                && owner instanceof Fragment
+                && (((Fragment) owner).getActivity() == null
                 || ((Fragment) owner).getActivity().isFinishing());
     }
 
