@@ -151,7 +151,7 @@ starting from version 0.1.0, there is Support for Android as follows :
 # Gradle Dependency for Android
 
 	dependencies {
-	    compile 'com.github.Ahmed-Adel-Ismail.Binder:binding:0.1.0'
+	    compile 'com.github.Ahmed-Adel-Ismail.Binder:android:0.1.0'
         annotationProcessor 'com.github.Ahmed-Adel-Ismail.Binder:processor:0.1.0'
 	}
 
