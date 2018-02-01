@@ -1,1 +1,1 @@
-include ':app', ':processor', ':binding', ':annotations', ':binding-android'
+include ':app', ':processor', ':binding', ':annotations', ':android'

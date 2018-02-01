@@ -23,6 +23,11 @@ allprojects {
     }
 }
 
+subprojects {
+    apply plugin: 'maven'
+    group = 'com.github.Ahmed-Adel-Ismail'
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }

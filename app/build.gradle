@@ -38,10 +38,10 @@ dependencies {
 
 
     implementation 'com.github.Ahmed-Adel-Ismail:LiteCycle:0.0.3'
-    implementation project(':binding-android')
+    implementation project(':android')
     annotationProcessor project(':processor')
 
 //    implementation 'com.github.Ahmed-Adel-Ismail.Binder:binding:0.0.7'
-//    compile 'com.github.Ahmed-Adel-Ismail.Binder:binding-android:0.0.7'
-//    annotationProcessor 'com.github.Ahmed-Adel-Ismail.Binder:processor:0.0.7'
+//    compile 'com.github.Ahmed-Adel-Ismail.Binder:binding-android:0.0.8'
+//    annotationProcessor 'com.github.Ahmed-Adel-Ismail.Binder:processor:0.0.8'
 }

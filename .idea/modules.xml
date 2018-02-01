@@ -3,11 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Binder.iml" filepath="$PROJECT_DIR$/Binder.iml" />
-      <module fileurl="file://C:\Development\Repositories\Personal\Binder\binding-android\android.iml" filepath="C:\Development\Repositories\Personal\Binder\binding-android\android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android/binding-android.iml" filepath="$PROJECT_DIR$/android/binding-android.iml" />
       <module fileurl="file://$PROJECT_DIR$/annotations/annotations.iml" filepath="$PROJECT_DIR$/annotations/annotations.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/binding/binding.iml" filepath="$PROJECT_DIR$/binding/binding.iml" />
-      <module fileurl="file://$PROJECT_DIR$/binding-android/binding-android.iml" filepath="$PROJECT_DIR$/binding-android/binding-android.iml" />
       <module fileurl="file://$PROJECT_DIR$/processor/processor.iml" filepath="$PROJECT_DIR$/processor/processor.iml" />
     </modules>
   </component>
