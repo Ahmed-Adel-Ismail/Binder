@@ -230,7 +230,7 @@ if you have a method that will clear / destroy your <b>ViewModel</b>, like the <
 		}
 	}
 	
-Notice that <b>@OnSubscriptionsClosed</b> will cause the <i>clear()</i> method to be invoked on any type of <b>ViewModel</b>, but for classes that extend <b>android.arch.lifecycle.ViewModel</b>, it is better to override the <i>onCleared()</i> method instead of using <b>OnSubscriptionsClosed</b>
+Notice that <b>@OnSubscriptionsClosed</b> will cause the <i>clear()</i> method to be invoked on any type of <b>ViewModel</b>, but for classes that extend <b>android.arch.lifecycle.ViewModel</b>, it is better to override the <i>onCleared()</i> method instead of using <b>@OnSubscriptionsClosed</b>
 
 # Pro Guard Rules 
 
