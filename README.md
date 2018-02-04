@@ -17,7 +17,8 @@ An Annotation processor that allows binding two classes with each other, where t
             return intSubject;
         }
         
-        void clear(){
+		@Override
+        public void onCleared(){
             intSubject.complete();
         }
 
@@ -55,12 +56,7 @@ We need to put <b>@SubscriptionName</b> above the source that we need to receive
         @Override
         protected void onDestroy() {
             super.onDestroy();
-            
             binder.unbind();
-            
-            if(isFinishing()){
-                binder.getSubscriptionsFactory().clear()
-            }
         }
     }
 
@@ -112,8 +108,6 @@ this way, the <b>Binder</b> will create a new instance of the Class mentioned in
 
 Although the example is on an MVVM pattern for Android, this can be applied to any two classes, so in our example, we can then Bind our <b>View-Model</b> to our <b>Inter-actor</b> or <b>Repositories</b>, and so on
     
-This library works with Java 8, which can be achieved for android by either working with Gradle 3+, or through using Retrolambda
-
 # Gradle Dependency
 
 Step 1. Add the JitPack repository to your build file
@@ -202,7 +196,8 @@ And declare the annotations in your ViewModel as follows :
 		@SubscriptionName("stringSubject")
 		final Subject<String> stringSubject = PublishSubject.create();
 		
-		void clear(){
+		@Override
+		public void onCleared(){
 			stringSubject.onComplete();
 		}	
 	}
@@ -235,7 +230,7 @@ if you have a method that will clear / destroy your <b>ViewModel</b>, like the <
 		}
 	}
 	
-Notice that <b>@OnSubscriptionsClosed</b> will cause the <i>clear()</i> method to be invoked on any type of <b>ViewModel</b>
+Notice that <b>@OnSubscriptionsClosed</b> will cause the <i>clear()</i> method to be invoked on any type of <b>ViewModel</b>, but for classes that extend <b>android.arch.lifecycle.ViewModel</b>, it is better to override the <i>onCleared()</i> method instead of using <b>OnSubscriptionsClosed</b>
 
 # Pro Guard Rules 
 
