@@ -136,7 +136,7 @@ allprojects {
 
 Step 2. Add the dependency
 
-```groovy
+```gradle
 dependencies {
     compile 'com.github.Ahmed-Adel-Ismail.Binder:binding:0.1.0'
     annotationProcessor 'com.github.Ahmed-Adel-Ismail.Binder:processor:0.1.0'
@@ -149,16 +149,16 @@ starting from version 0.1.0, there is Support for Android as follows :
 
 # Gradle Dependency for Android
 
-```groovy
-	dependencies {
-	    compile 'com.github.Ahmed-Adel-Ismail.Binder:android:0.1.0'
-        annotationProcessor 'com.github.Ahmed-Adel-Ismail.Binder:processor:0.1.0'
-	}
+```gradle
+dependencies {
+    compile 'com.github.Ahmed-Adel-Ismail.Binder:android:0.1.0'
+    annotationProcessor 'com.github.Ahmed-Adel-Ismail.Binder:processor:0.1.0'
+}
 ```
 
 # Update your Application class 
 
-```groovy
+```gradle
 	@Override
     public void onCreate() {
         super.onCreate();
