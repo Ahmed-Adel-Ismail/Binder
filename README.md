@@ -159,11 +159,11 @@ dependencies {
 # Update your Application class 
 
 ```gradle
-	@Override
-    public void onCreate() {
-        super.onCreate();
-        Binding.integrate(this);
-    }
+@Override
+public void onCreate() {
+    super.onCreate();
+    Binding.integrate(this);
+}
 ```
 	
 # Implement MVVM with Binding processor on Activities and Fragments
