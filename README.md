@@ -4,7 +4,7 @@
 An Annotation processor that allows binding two classes with each other, where the first class can listen to the updates of the second class, like in <b>MVVM</b>, when we need our <b>View</b> to subscribe on the <b>View-Model</b>, so when it's variables update, we want our views to be updated as well ... although this library is not limited to <b>MVVM</b>, and also it allows this behavior between any two Objects, but it will be explained on an <b>MVVM</b> example for <b>Android</b> 
 
 # Declaring the View-Model (Subscriptions source)
-
+```java
     public class ViewModel extends android.arch.lifecycle.ViewModel {
 
         @SubscriptionName("stringLiveData")
@@ -23,11 +23,12 @@ An Annotation processor that allows binding two classes with each other, where t
         }
 
     }
+```
 
 We need to put <b>@SubscriptionName</b> above the source that we need to receive it's updates, weather on the non-private variable, or on the non-private getter, as shown above ... the value passed to the annotation should be unique per class, as shown in the example, the <b>stringLiveData</b> variable is annotated with <b>@SubscriptionName("stringLiveData")</b>, and the <b>intSubject</b> getter is annotated with <b>@SubscriptionName("intSubject")</b>, the values "stringSubject" and "intSubject" are unique, if one is repeated, an error will occur during compilation
 
 # Declaring our View (Subscribers)
-
+```java
     @SubscriptionsFactory(ViewModel.class)
     public class MainActivity extends AppCompatActivity {
 
@@ -59,11 +60,13 @@ We need to put <b>@SubscriptionName</b> above the source that we need to receive
             binder.unbind();
         }
     }
+```
 
 The first step is to tell the Annotation Processor where it can find the Subscriptions sources (our View-Model), through the annotation <b>@SubscriptionsFactory</b>
 
 Then we declare our methods that will be invoked in the subscription process, like the following method :
 
+```java
     @SubscribeTo("stringLiveData")
     void stringLiveDataSubscriber(MutableLiveData<String> liveData) {
         liveData.observe(this, text -> Log.e("MainActivity", "liveData : " + text));
@@ -75,6 +78,7 @@ Then we declare our methods that will be invoked in the subscription process, li
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(v -> Log.e("MainActivity", "intSubject : " + v));
     }
+```
     
 in our annotation <b>@SubscribeTo</b>, we pass the key that we declared in our <b>View-Model's @SubscriptionName</b> annotation, in this example we subscribe to the <b>Subject<Integer> intSubject</b> that was declared in our <b>View-Model</b>
     
@@ -87,16 +91,21 @@ after the annotation step, our method should be :
 
 at the end we do the subscription process through calling the below lines :
 
+```java
     binder = Binder.bind(this).to(viewModel);
+```
 
 the above code will do the binding process and return a <b>Binder</b> which will hold all the Disposables created by our methods, and we then can clear it in our <b>onDestroy()</b> by calling :
 
+```java
 	binder.unbind();
+```
 
 we can access the <b>View-Model</b> (our Subscriptions Factory) through this getter method :
 
+```java
 	binder.getSubscriptionsFactory();
-
+```
 
 Another way to initialize the binding process is to invoke the below lines :
 
@@ -114,19 +123,23 @@ Step 1. Add the JitPack repository to your build file
 
 Add it in your root build.gradle at the end of repositories:
 
+```gradle
 	allprojects {
 	    repositories {
 		    ...
 		    maven { url 'https://jitpack.io' }
 	    }
 	}
+```
 
 Step 2. Add the dependency
 
+```gradle
 	dependencies {
 	    compile 'com.github.Ahmed-Adel-Ismail.Binder:binding:0.1.0'
         annotationProcessor 'com.github.Ahmed-Adel-Ismail.Binder:processor:0.1.0'
 	}
+```
 	
 # Android Support
 
@@ -134,23 +147,28 @@ starting from version 0.1.0, there is Support for Android as follows :
 
 # Gradle Dependency for Android
 
+```gradle
 	dependencies {
 	    compile 'com.github.Ahmed-Adel-Ismail.Binder:android:0.1.0'
         annotationProcessor 'com.github.Ahmed-Adel-Ismail.Binder:processor:0.1.0'
 	}
+```
 
 # Update your Application class 
 
+```gradle
 	@Override
     public void onCreate() {
         super.onCreate();
         Binding.integrate(this);
     }
+```
 	
 # Implement MVVM with Binding processor on Activities and Fragments
 
 You do not need to handle the Binding operations any more, just declare the annotations in your <b>Activity</b> or <b>android.support.v4.app.Fragment</b> as follows :
 
+```java
 	@SubscriptionsFactory(MainViewModel.class)
 	public class MainActivity extends AppCompatActivity {
 
@@ -188,9 +206,11 @@ You do not need to handle the Binding operations any more, just declare the anno
 					.subscribe(v -> Log.e("MainFragment", "stringSubject : " + v));
 		}
 	}
+```
 
 And declare the annotations in your ViewModel as follows :
 
+```java
 	public class MainViewModel extends android.arch.lifecycle.ViewModel {
 
 		@SubscriptionName("stringSubject")
@@ -201,11 +221,13 @@ And declare the annotations in your ViewModel as follows :
 			stringSubject.onComplete();
 		}	
 	}
+```
 	
 Since the <b>MainViewModel</b> extends the new Architecture components <b>ViewModel</b>, it will be shared accross all the Fragments and there Activity, if it does not extend the <b>android.arch.lifecycle.ViewModel</b>, a new instance will be created for each, which means that an instance will be created for The MainActivity, and another will be created to MainFragment
 
 If you want the <b>MainViewModel</b> to not extend the <b>android.arch.lifecycle.ViewModel</b>, and be shared between the Activity and it's Fragments, you can annotate the class with <b>@SharedSubscriptionFactory</b>, as follows :
 
+```java
 	@SharedSubscriptionFactory
 	public class MainViewModel {
 
@@ -216,9 +238,11 @@ If you want the <b>MainViewModel</b> to not extend the <b>android.arch.lifecycle
 			stringSubject.onComplete();
 		}
 	}
+```
 	
 if you have a method that will clear / destroy your <b>ViewModel</b>, like the <i>clear()</i> method in the <b>MainViewModel</b>, you can annotate it with <b>@OnSubscriptionsClosed</b>, this will cause the <b>Binder</b> to call it when the Activity / Fragment is totally destroyed (not rotating), and if this ViewModel is shared between Activity and it's Fragments, this method will be invoked when the Activity is totally destroyed (not rotating), so our <b>ViewModel</b> will look like this :
 
+```java
 	public class MainViewModel {
 
 		@SubscriptionName("stringSubject")
@@ -229,17 +253,18 @@ if you have a method that will clear / destroy your <b>ViewModel</b>, like the <
 			stringSubject.onComplete();
 		}
 	}
+```
 	
 Notice that <b>@OnSubscriptionsClosed</b> will cause the <i>clear()</i> method to be invoked on any type of <b>ViewModel</b>, but for classes that extend <b>android.arch.lifecycle.ViewModel</b>, it is better to override the <i>onCleared()</i> method instead of using <b>@OnSubscriptionsClosed</b>
 
 # Pro Guard Rules 
 
 For Pro Guard, you may need to add those lines in the proguard-rules file :
-	
+```proguard
 	-keep class java.lang.annotation.** { *; }
 	-keep class **$$Subscribers { *; }
 	-keepclassmembers class ** {
   		@** *;
 	}
-
+```
 * For Pro Guard rules, I'm waiting for your feed-back as this is under development still
