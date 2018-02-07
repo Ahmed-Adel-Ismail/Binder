@@ -278,4 +278,4 @@ For Pro Guard, you may need to add those lines in the proguard-rules file :
     @com.android.binding.* <methods>;
 }
 ```
-* For Pro Guard rules, I'm waiting for your feed-back as this is under development still
+* Starting from version 1.0.0, package names were changed, so if you were using older version, just remove the import statements, and import the same classes from the new packages  
