@@ -263,10 +263,19 @@ Notice that <b>@OnSubscriptionsClosed</b> will cause the <i>clear()</i> method t
 
 For Pro Guard, you may need to add those lines in the proguard-rules file :
 ```proguard
-	-keep class java.lang.annotation.** { *; }
+	# Keep default constructors inside classes
+	-keepclassmembers class * {
+	   public protected <init>(...);
+	   <init>(...);
+	}
+
+	# Keep generated classes names
 	-keep class **$$Subscribers { *; }
-	-keepclassmembers class ** {
-  		@** *;
+
+	# keep classes with annotated members
+	-keepclasseswithmembers class * {
+		@com.vodafone.binding.annotations.* <methods>;
+		@com.android.binding.* <methods>;
 	}
 ```
 * For Pro Guard rules, I'm waiting for your feed-back as this is under development still
