@@ -19,3 +19,21 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+-dontwarn android.**
+-dontwarn org.junit.**
+
+# Keep default constructors inside classes
+-keepclassmembers class * {
+   public protected <init>(...);
+   <init>(...);
+}
+
+# Keep generated classes names
+-keep class **$$Subscribers { *; }
+
+# keep classes with annotated members
+-keepclasseswithmembers class * {
+    @com.vodafone.binding.annotations.* <methods>;
+    @com.android.binding.* <methods>;
+}

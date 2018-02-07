@@ -15,6 +15,12 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+
+        debug {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
     }
     compileOptions {
         sourceCompatibility = "1.8"
@@ -37,11 +43,11 @@ dependencies {
     implementation 'com.github.Ahmed-Adel-Ismail:RxProperties:0.0.2'
 
 
-    implementation 'com.github.Ahmed-Adel-Ismail:LiteCycle:0.0.3'
-    implementation project(':android')
-    annotationProcessor project(':processor')
+    implementation 'com.github.Ahmed-Adel-Ismail:LiteCycle:1.1.1'
+//    implementation project(':android')
+//    annotationProcessor project(':processor')
 
 //    implementation 'com.github.Ahmed-Adel-Ismail.Binder:binding:0.0.10'
-//    implementation 'com.github.Ahmed-Adel-Ismail.Binder:android:0.0.10'
-//    annotationProcessor 'com.github.Ahmed-Adel-Ismail.Binder:processor:0.0.10'
+    implementation 'com.github.Ahmed-Adel-Ismail.Binder:android:0.1.0'
+    annotationProcessor 'com.github.Ahmed-Adel-Ismail.Binder:processor:0.1.0'
 }
