@@ -5,6 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.vodafone.binder.SubActivity">
+    tools:context="com.vodafone.binder.com.app.SubActivity">
 
 </android.support.constraint.ConstraintLayout>

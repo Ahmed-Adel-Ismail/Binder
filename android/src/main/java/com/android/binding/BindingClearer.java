@@ -3,7 +3,7 @@ package com.android.binding;
 import android.app.Activity;
 import android.support.v4.app.Fragment;
 
-import com.vodafone.binding.Binder;
+import com.binding.Binder;
 
 import java.lang.reflect.Method;
 

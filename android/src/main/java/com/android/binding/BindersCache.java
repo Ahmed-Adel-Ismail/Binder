@@ -1,6 +1,6 @@
 package com.android.binding;
 
-import com.vodafone.binding.Binder;
+import com.binding.Binder;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;

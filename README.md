@@ -138,8 +138,8 @@ Step 2. Add the dependency
 
 ```gradle
 dependencies {
-    compile 'com.github.Ahmed-Adel-Ismail.Binder:binding:0.1.0'
-    annotationProcessor 'com.github.Ahmed-Adel-Ismail.Binder:processor:0.1.0'
+    compile 'com.github.Ahmed-Adel-Ismail.Binder:binding:1.0.0'
+    annotationProcessor 'com.github.Ahmed-Adel-Ismail.Binder:processor:1.0.0'
 }
 ```
 	
@@ -151,8 +151,8 @@ starting from version 0.1.0, there is Support for Android as follows :
 
 ```gradle
 dependencies {
-    compile 'com.github.Ahmed-Adel-Ismail.Binder:android:0.1.0'
-    annotationProcessor 'com.github.Ahmed-Adel-Ismail.Binder:processor:0.1.0'
+    compile 'com.github.Ahmed-Adel-Ismail.Binder:android:1.0.0'
+    annotationProcessor 'com.github.Ahmed-Adel-Ismail.Binder:processor:1.0.0'
 }
 ```
 
@@ -263,19 +263,19 @@ Notice that <b>@OnSubscriptionsClosed</b> will cause the <i>clear()</i> method t
 
 For Pro Guard, you may need to add those lines in the proguard-rules file :
 ```proguard
-	# Keep default constructors inside classes
-	-keepclassmembers class * {
-	   public protected <init>(...);
-	   <init>(...);
-	}
+# Keep default constructors inside classes
+-keepclassmembers class * {
+   public protected <init>(...);
+   <init>(...);
+}
 
-	# Keep generated classes names
-	-keep class **$$Subscribers { *; }
+# Keep generated classes names
+-keep class **$$Subscribers { *; }
 
-	# keep classes with annotated members
-	-keepclasseswithmembers class * {
-		@com.vodafone.binding.annotations.* <methods>;
-		@com.android.binding.* <methods>;
-	}
+# keep classes with annotated members
+-keepclasseswithmembers class * {
+    @com.binding.annotations.* <methods>;
+    @com.android.binding.* <methods>;
+}
 ```
 * For Pro Guard rules, I'm waiting for your feed-back as this is under development still

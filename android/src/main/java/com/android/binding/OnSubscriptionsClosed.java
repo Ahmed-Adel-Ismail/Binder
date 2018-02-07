@@ -1,7 +1,7 @@
 package com.android.binding;
 
-import com.vodafone.binding.Binder;
-import com.vodafone.binding.annotations.SubscriptionsFactory;
+import com.binding.Binder;
+import com.binding.annotations.SubscriptionsFactory;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

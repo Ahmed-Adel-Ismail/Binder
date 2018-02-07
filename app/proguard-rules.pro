@@ -32,8 +32,8 @@
 # Keep generated classes names
 -keep class **$$Subscribers { *; }
 
-# keep classes with annotated members
+# Keep classes with annotated members
 -keepclasseswithmembers class * {
-    @com.vodafone.binding.annotations.* <methods>;
+    @com.binding.annotations.* <methods>;
     @com.android.binding.* <methods>;
 }

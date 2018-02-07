@@ -2,8 +2,8 @@ package com.android.binding;
 
 import android.arch.lifecycle.ViewModel;
 
-import com.vodafone.binding.Binder;
-import com.vodafone.binding.annotations.SubscriptionsFactory;
+import com.binding.Binder;
+import com.binding.annotations.SubscriptionsFactory;
 
 /**
  * an interface implemented by classes that provides a custom {@link SubscriptionsFactory} Object,

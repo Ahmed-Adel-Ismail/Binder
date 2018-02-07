@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 26
     defaultConfig {
-        applicationId "com.vodafone.binder"
+        applicationId "com.binder.app"
         minSdkVersion 21
         targetSdkVersion 26
         versionCode 1
@@ -44,10 +44,10 @@ dependencies {
 
 
     implementation 'com.github.Ahmed-Adel-Ismail:LiteCycle:1.1.1'
-//    implementation project(':android')
-//    annotationProcessor project(':processor')
+    implementation project(':android')
+    annotationProcessor project(':processor')
 
 //    implementation 'com.github.Ahmed-Adel-Ismail.Binder:binding:0.0.10'
-    implementation 'com.github.Ahmed-Adel-Ismail.Binder:android:0.1.0'
-    annotationProcessor 'com.github.Ahmed-Adel-Ismail.Binder:processor:0.1.0'
+//    implementation 'com.github.Ahmed-Adel-Ismail.Binder:android:0.1.0'
+//    annotationProcessor 'com.github.Ahmed-Adel-Ismail.Binder:processor:0.1.0'
 }

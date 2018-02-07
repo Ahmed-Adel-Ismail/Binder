@@ -5,11 +5,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.vodafone.binder.MainActivity">
+    tools:context="com.vodafone.binder.com.app.MainActivity">
 
     <fragment
         android:id="@+id/fragment_main"
-        android:name="com.vodafone.binder.MainFragment"
+        android:name="com.binder.app.MainFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         />
