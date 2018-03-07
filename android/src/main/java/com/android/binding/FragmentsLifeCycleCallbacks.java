@@ -1,6 +1,5 @@
 package com.android.binding;
 
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 
@@ -13,14 +12,19 @@ class FragmentsLifeCycleCallbacks extends FragmentManager.FragmentLifecycleCallb
 
 
     @Override
-    public void onFragmentCreated(FragmentManager fm, Fragment f, Bundle savedInstanceState) {
+    public void onFragmentStarted(FragmentManager fm, Fragment f) {
+        if (!BindersCache.contains(f)) {
+            bind(f);
+        }
+    }
+
+    private void bind(Fragment activity) {
         try {
-            new BindingInitializer().accept(f);
+            new BindingInitializer().accept(activity);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 
     @Override
     public void onFragmentDestroyed(FragmentManager fm, Fragment f) {

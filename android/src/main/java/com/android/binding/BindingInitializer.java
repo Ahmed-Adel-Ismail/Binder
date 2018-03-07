@@ -23,13 +23,8 @@ class BindingInitializer implements Consumer<Object> {
 
     @Override
     public void accept(Object owner) throws Exception {
-
         if (isAnnotatedWithSubscriptionFactory(owner)) {
             BindersCache.put(owner, bind(owner));
-        }
-
-        if (owner instanceof FragmentActivity) {
-            registerFragmentsLifeCycleCallbacks((FragmentActivity) owner);
         }
     }
 
@@ -40,14 +35,6 @@ class BindingInitializer implements Consumer<Object> {
     private Binder<Object> bind(Object owner) throws Exception {
         return Binder.bind(owner)
                 .to(subscriptionsFactory(owner, subscriptionFactoryClass(owner)));
-    }
-
-
-    private void registerFragmentsLifeCycleCallbacks(FragmentActivity activity) {
-        FragmentManager fragmentManager = activity.getSupportFragmentManager();
-        if (fragmentManager != null) {
-            fragmentManager.registerFragmentLifecycleCallbacks(new FragmentsLifeCycleCallbacks(), true);
-        }
     }
 
     @NonNull
@@ -64,14 +51,6 @@ class BindingInitializer implements Consumer<Object> {
         }
     }
 
-    private Object reuseOrCreateSubscriptionsFactory(Class<?> factoryClass) throws Exception {
-        Object factory = BindersCache.getSubscriptionsFactoryOrNull(factoryClass);
-        if (factory == null) {
-            factory = createNewSubscriptionsFactory(factoryClass);
-        }
-        return factory;
-    }
-
     @NonNull
     private Class<?> subscriptionFactoryClass(Object owner) {
         return owner.getClass().getAnnotation(SubscriptionsFactory.class).value();
@@ -86,6 +65,14 @@ class BindingInitializer implements Consumer<Object> {
     @SuppressWarnings("unchecked")
     private Class<? extends ViewModel> viewModelClass(Class<?> subscriptionFactory) {
         return (Class<? extends ViewModel>) subscriptionFactory;
+    }
+
+    private Object reuseOrCreateSubscriptionsFactory(Class<?> factoryClass) throws Exception {
+        Object factory = BindersCache.getSubscriptionsFactoryOrNull(factoryClass);
+        if (factory == null) {
+            factory = createNewSubscriptionsFactory(factoryClass);
+        }
+        return factory;
     }
 
     private Object createNewSubscriptionsFactory(Class<?> factoryClass) throws Exception {

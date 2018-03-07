@@ -3,6 +3,8 @@ package com.android.binding;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 
 /**
  * a class that handles Activities LifeCycle callbacks
@@ -14,17 +16,32 @@ class ActivitiesLifeCycleCallback implements Application.ActivityLifecycleCallba
 
     @Override
     public void onActivityCreated(final Activity activity, Bundle savedInstanceState) {
+        if (activity instanceof FragmentActivity) {
+            registerFragmentsLifeCycleCallbacks((FragmentActivity) activity);
+        }
+    }
+
+    private void registerFragmentsLifeCycleCallbacks(FragmentActivity activity) {
+        FragmentManager fragmentManager = activity.getSupportFragmentManager();
+        if (fragmentManager != null) {
+            fragmentManager.registerFragmentLifecycleCallbacks(new FragmentsLifeCycleCallbacks(), true);
+        }
+    }
+
+    @Override
+    public void onActivityStarted(Activity activity) {
+        if (!BindersCache.contains(activity)) {
+            bind(activity);
+        }
+
+    }
+
+    private void bind(Activity activity) {
         try {
             new BindingInitializer().accept(activity);
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-    }
-
-    @Override
-    public void onActivityStarted(Activity activity) {
-
     }
 
     @Override

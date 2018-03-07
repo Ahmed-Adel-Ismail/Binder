@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.android.LiteCycle;
 import com.binding.annotations.SubscribeTo;
@@ -19,10 +20,13 @@ import io.reactivex.subjects.Subject;
 @SubscriptionsFactory(ViewModel.class)
 public class MainActivity extends AppCompatActivity {
 
+    private TextView textView;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        textView = findViewById(R.id.act_text);
     }
 
     @SubscribeTo("updateData")
@@ -39,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         return subject.share()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(textView::setText)
                 .subscribe(v -> Log.e("MainActivity", "stringSubject : " + v));
     }
 
@@ -65,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @SubscribeTo("ownerName")
-    void updateOwnerName(Subject<String> ownerName){
+    void updateOwnerName(Subject<String> ownerName) {
         ownerName.onNext(getClass().getSimpleName());
     }
 

@@ -49,4 +49,8 @@ class BindersCache {
     static Binder remove(Object o) {
         return binders.remove(o);
     }
+
+    static boolean contains(Object owner) {
+        return binders.containsKey(owner);
+    }
 }
