@@ -138,8 +138,8 @@ Step 2. Add the dependency
 
 ```gradle
 dependencies {
-    compile 'com.github.Ahmed-Adel-Ismail.Binder:binding:1.0.0'
-    annotationProcessor 'com.github.Ahmed-Adel-Ismail.Binder:processor:1.0.0'
+    compile 'com.github.Ahmed-Adel-Ismail.Binder:binding:1.1.0'
+    annotationProcessor 'com.github.Ahmed-Adel-Ismail.Binder:processor:1.1.0'
 }
 ```
 	
@@ -151,8 +151,8 @@ starting from version 0.1.0, there is Support for Android as follows :
 
 ```gradle
 dependencies {
-    compile 'com.github.Ahmed-Adel-Ismail.Binder:android:1.0.0'
-    annotationProcessor 'com.github.Ahmed-Adel-Ismail.Binder:processor:1.0.0'
+    compile 'com.github.Ahmed-Adel-Ismail.Binder:android:1.1.0'
+    annotationProcessor 'com.github.Ahmed-Adel-Ismail.Binder:processor:1.1.0'
 }
 ```
 
